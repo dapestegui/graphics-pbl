@@ -121,7 +121,7 @@ void computeMatricesFromInputs(){
 	ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 100.0f);
 	// Camera matrix
     //ViewMatrix       = glm::lookAt(position, position+direction, up);
-    ViewMatrix       = glm::lookAt(position+direction, glm::vec3(7,7,0), glm::vec3(0,1,0));
+    ViewMatrix       = glm::lookAt(position+direction, glm::vec3(7,0,7), glm::vec3(0,1,0));
                                 // Camera is here
 								// and looks here : at the same position, plus "direction"
                                 // Head is up (set to 0,-1,0 to look upside-down)

@@ -151,54 +151,85 @@ int main( void )
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
 
 	// Load the texture
-	GLuint Texture_DW = loadBMP_custom("resources/DW.bmp");
-    GLuint Texture_LW = loadBMP_custom("resources/LW.bmp");
+	GLuint Texture_Black = loadBMP_custom("resources/DW.bmp");
+    GLuint Texture_White = loadBMP_custom("resources/LW.bmp");
 	
 	// Get a handle for our "myTextureSampler" uniform
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
     Object Board[2];
-    Board[0].load("resources/CB_BParts.obj", Texture_DW, TextureID);
-    Board[1].load("resources/CB_WParts.obj", Texture_LW, TextureID);
+    Board[0].load("resources/CB_BParts.obj", Texture_Black, TextureID);
+    Board[1].load("resources/CB_WParts.obj", Texture_White, TextureID);
     
     //Create an array for all white pieces
     // 0 to 7 - Pawn / 8 and 9 - Rook / 10 and 11 - Knight / 12 and 13 - Bishop / 14 - Queen / 15 - King
-    Object WPieces[16];
+    Object WPieces[16], BPieces[16];
     
     //Load the obj file and copy the data for all Pawns
-    WPieces[0].load("resources/CB_Pawn.obj", Texture_LW, TextureID);
+    WPieces[0].load("resources/CB_Pawn.obj", Texture_White, TextureID);
     WPieces[1] = WPieces[2] = WPieces[3] = WPieces[4] = WPieces[5] = WPieces[6] = WPieces[7] = WPieces[0];
     
     // Set positions for all Pawns
     for (int i = 0; i < 8; i++) {
-        WPieces[i].setPos(2.0f*i, 2.0f, 0.0f);
+        WPieces[i].setPos(2.0f, 0.0f, 2.0f*i);
     }
     
-    WPieces[8].load("resources/CB_Rook.obj", Texture_LW, TextureID);
+    // Set positions for other pieces
+    WPieces[8].load("resources/CB_Rook.obj", Texture_White, TextureID);
     WPieces[9] = WPieces[8];
     WPieces[8].setPos(0.0f, 0.0f, 0.0f);
-    WPieces[9].setPos(14.0f, 0.0f, 0.0f);
+    WPieces[9].setPos(0.0f, 0.0f, 14.0f);
     
-    WPieces[10].load("resources/CB_Knight.obj", Texture_LW, TextureID);
+    WPieces[10].load("resources/CB_Knight.obj", Texture_White, TextureID);
     WPieces[11] = WPieces[10];
-    WPieces[10].setPos(2.0f, 0.0f, 0.0f);
-    WPieces[11].setPos(12.0f, 0.0f, 0.0f);
+    WPieces[10].setPos(0.0f, 0.0f, 2.0f);
+    WPieces[11].setPos(0.0f, 0.0f, 12.0f);
     
-    WPieces[12].load("resources/CB_Bishop.obj", Texture_LW, TextureID);
+    WPieces[12].load("resources/CB_Bishop.obj", Texture_White, TextureID);
     WPieces[13] = WPieces[12];
-    WPieces[12].setPos(4.0f, 0.0f, 0.0f);
-    WPieces[13].setPos(10.0f, 0.0f, 0.0f);
+    WPieces[12].setPos(0.0f, 0.0f, 4.0f);
+    WPieces[13].setPos(0.0f, 0.0f, 10.0f);
     
-    WPieces[14].load("resources/CB_Queen.obj", Texture_LW, TextureID);
-    WPieces[15].load("resources/CB_King.obj", Texture_LW, TextureID);
-    WPieces[14].setPos(6.0f, 0.0f, 0.0f);
-    WPieces[15].setPos(8.0f, 0.0f, 0.0f);
+    WPieces[14].load("resources/CB_Queen.obj", Texture_White, TextureID);
+    WPieces[15].load("resources/CB_King.obj", Texture_White, TextureID);
+    WPieces[14].setPos(0.0f, 0.0f, 6.0f);
+    WPieces[15].setPos(0.0f, 0.0f, 8.0f);
+    
+    //Load the obj file and copy the data for all Pawns
+    BPieces[0].load("resources/CB_Pawn.obj", Texture_Black, TextureID);
+    BPieces[1] = BPieces[2] = BPieces[3] = BPieces[4] = BPieces[5] = BPieces[6] = BPieces[7] = BPieces[0];
+    
+    // Set positions for all Pawns
+    for (int i = 0; i < 8; i++) {
+        BPieces[i].setPos(12.0f, 0.0f, 2.0f*i);
+    }
+    
+    // Set positions for other pieces
+    BPieces[8].load("resources/CB_Rook.obj", Texture_Black, TextureID);
+    BPieces[9] = BPieces[8];
+    BPieces[8].setPos(14.0f, 0.0f, 0.0f);
+    BPieces[9].setPos(14.0f, 0.0f, 14.0f);
+    
+    BPieces[10].load("resources/CB_KnightB.obj", Texture_Black, TextureID);
+    BPieces[11] = BPieces[10];
+    BPieces[10].setPos(14.0f, 0.0f, 2.0f);
+    BPieces[11].setPos(14.0f, 0.0f, 12.0f);
+    
+    BPieces[12].load("resources/CB_Bishop.obj", Texture_Black, TextureID);
+    BPieces[13] = BPieces[12];
+    BPieces[12].setPos(14.0f, 0.0f, 4.0f);
+    BPieces[13].setPos(14.0f, 0.0f, 10.0f);
+    
+    BPieces[14].load("resources/CB_Queen.obj", Texture_Black, TextureID);
+    BPieces[15].load("resources/CB_King.obj", Texture_Black, TextureID);
+    BPieces[14].setPos(14.0f, 0.0f, 6.0f);
+    BPieces[15].setPos(14.0f, 0.0f, 8.0f);
     
     // Get a handle for our "LightPosition" uniform
     glUseProgram(programID);
     GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
     
-    glm::vec3 lightPos = glm::vec3(7,7,10);
+    glm::vec3 lightPos = glm::vec3(7,10,7);
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 	do{
@@ -214,16 +245,20 @@ int main( void )
         ProjMatrix PM;
         PM.uniform(MatrixID, ViewMatrixID, ModelMatrixID);
         
+        //Fixed parts - Chess Board
         for (int i = 0; i < 2; i++) {
             drawOBJ(Board[i], PM, 0);
         }
         
+        // Draw all the pieces
         for (int i = 0; i < 16; i++) {
             drawOBJ(WPieces[i], PM, 1);
+            drawOBJ(BPieces[i], PM, 1);
         }
         
-        if (WPieces[2].pos.y < 14) {
-            WPieces[2].pos.y += 0.20f;
+        // Move one piece to y=14
+        if (WPieces[2].pos.x < 10) {
+            WPieces[2].pos.x += 0.20f;
         }
         
         // Swap buffers
@@ -243,8 +278,8 @@ int main( void )
     }
     
 	glDeleteProgram(programID);
-	glDeleteTextures(1, &Texture_DW);
-    glDeleteTextures(1, &Texture_LW);
+	glDeleteTextures(1, &Texture_Black);
+    glDeleteTextures(1, &Texture_White);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
 	// Close OpenGL window and terminate GLFW

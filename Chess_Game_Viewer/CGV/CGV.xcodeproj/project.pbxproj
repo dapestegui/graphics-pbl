@@ -63,7 +63,7 @@
 		2D4D41D0208D252F000A36B0 /* CB_BParts.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB_BParts.obj; sourceTree = "<group>"; };
 		2D4D41D1208D252F000A36B0 /* LW.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = LW.bmp; sourceTree = "<group>"; };
 		2D4D41D2208D252F000A36B0 /* CB_King.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB_King.obj; sourceTree = "<group>"; };
-		2D4D41D3208D252F000A36B0 /* CB.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB.obj; sourceTree = "<group>"; };
+		2D4D41D5208DE789000A36B0 /* CB_KnightB.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB_KnightB.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +144,7 @@
 		2D4D41BD208D24DF000A36B0 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				2D4D41D5208DE789000A36B0 /* CB_KnightB.obj */,
 				2D4D41C9208D252E000A36B0 /* CB_Bishop.obj */,
 				2D4D41D0208D252F000A36B0 /* CB_BParts.obj */,
 				2D4D41D2208D252F000A36B0 /* CB_King.obj */,
@@ -152,7 +153,6 @@
 				2D4D41CE208D252F000A36B0 /* CB_Queen.obj */,
 				2D4D41CC208D252E000A36B0 /* CB_Rook.obj */,
 				2D4D41CA208D252E000A36B0 /* CB_WParts.obj */,
-				2D4D41D3208D252F000A36B0 /* CB.obj */,
 				2D4D41CD208D252E000A36B0 /* DW.bmp */,
 				2D4D41D1208D252F000A36B0 /* LW.bmp */,
 			);
