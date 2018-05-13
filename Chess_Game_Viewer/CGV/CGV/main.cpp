@@ -20,23 +20,26 @@ using namespace glm;
 #include "texture.hpp"
 #include "controls.hpp"
 #include "objloader.hpp"
-
+#include "text2D.hpp"
 #include "Object.cpp"
 
 //void drawOBJ(std::vector<glm::vec3> &vertices, GLuint &Texture, GLuint &TextureID, GLuint &vertexbuffer, GLuint &uvbuffer, GLuint &normalbuffer)
-void drawOBJ(Object &obj, ProjMatrix &PM, bool dynamic)
+void drawOBJ(Object &obj, ProjMatrix &PM)
 {
-    if (dynamic)
-    {
-        PM.MVP = PM.ProjectionMatrix * PM.ViewMatrix * glm::translate(glm::mat4(), obj.pos);
-        glUniformMatrix4fv(PM.MatrixID, 1, GL_FALSE, &PM.MVP[0][0]);
-    }
+//    if (dynamic)
+//    {
+    PM.MVP = PM.ProjectionMatrix * PM.ViewMatrix * glm::translate(glm::mat4(), obj.pos);
+    glUniformMatrix4fv(PM.MatrixID, 1, GL_FALSE, &PM.MVP[0][0]);
+    
+    glm::vec3 lightPos = glm::vec3(7 - obj.pos.x,12 - obj.pos.y,7 - obj.pos.z);
+    glUniform3f(PM.LightID, lightPos.x, lightPos.y, lightPos.z);
+//    }
     
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, obj.texture);
+    glBindTexture(GL_TEXTURE_2D, *obj.texture);
     // Set our "myTextureSampler" sampler to use Texture Unit 0
-    glUniform1i(obj.textureID, 0);
+    glUniform1i(*obj.textureID, 0);
     
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -75,7 +78,7 @@ void drawOBJ(Object &obj, ProjMatrix &PM, bool dynamic)
                           );
     
     // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, obj.v.size() );
+    glDrawArrays(GL_TRIANGLES, 0, GLsizei(obj.v.size()) );
     //glDrawElements(GL_VERTEX_ARRAY, vertices.size(), GL_UNSIGNED_INT, 0);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -100,9 +103,9 @@ int main( void )
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Chess Game Viewer", NULL, NULL);
+	window = glfwCreateWindow( 1024, 768, "Chess Game Viewer", NULL, NULL); //1024, 768
 	if( window == NULL ){
-		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
+		fprintf( stderr, "Failed to open GLFW window.\n" );
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -149,6 +152,10 @@ int main( void )
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
     GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
+    
+//    // Textures array
+//    char textures[4][3];
+//
 
 	// Load the texture
 	GLuint Texture_Black = loadBMP_custom("resources/DW.bmp");
@@ -158,45 +165,46 @@ int main( void )
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
     Object Board[2];
-    Board[0].load("resources/CB_BParts.obj", Texture_Black, TextureID);
-    Board[1].load("resources/CB_WParts.obj", Texture_White, TextureID);
+    Board[0].load("resources/CB_BParts.obj", "BD", Texture_Black, TextureID);
+    Board[1].load("resources/CB_WParts.obj", "BD", Texture_White, TextureID);
     
     //Create an array for all white pieces
     // 0 to 7 - Pawn / 8 and 9 - Rook / 10 and 11 - Knight / 12 and 13 - Bishop / 14 - Queen / 15 - King
     Object WPieces[16], BPieces[16];
     
     //Load the obj file and copy the data for all Pawns
-    WPieces[0].load("resources/CB_Pawn.obj", Texture_White, TextureID);
+    WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
     WPieces[1] = WPieces[2] = WPieces[3] = WPieces[4] = WPieces[5] = WPieces[6] = WPieces[7] = WPieces[0];
     
     // Set positions for all Pawns
+    // X - move forward - rows / Y - move up / Z - move to the side - columns
     for (int i = 0; i < 8; i++) {
         WPieces[i].setPos(2.0f, 0.0f, 2.0f*i);
     }
     
     // Set positions for other pieces
-    WPieces[8].load("resources/CB_Rook.obj", Texture_White, TextureID);
+    WPieces[8].load("resources/CB_Rook.obj", "WR", Texture_White, TextureID);
     WPieces[9] = WPieces[8];
     WPieces[8].setPos(0.0f, 0.0f, 0.0f);
     WPieces[9].setPos(0.0f, 0.0f, 14.0f);
     
-    WPieces[10].load("resources/CB_Knight.obj", Texture_White, TextureID);
+    WPieces[10].load("resources/CB_Knight.obj", "WN", Texture_White, TextureID);
     WPieces[11] = WPieces[10];
     WPieces[10].setPos(0.0f, 0.0f, 2.0f);
     WPieces[11].setPos(0.0f, 0.0f, 12.0f);
     
-    WPieces[12].load("resources/CB_Bishop.obj", Texture_White, TextureID);
+    WPieces[12].load("resources/CB_Bishop.obj", "WB", Texture_White, TextureID);
     WPieces[13] = WPieces[12];
     WPieces[12].setPos(0.0f, 0.0f, 4.0f);
     WPieces[13].setPos(0.0f, 0.0f, 10.0f);
     
-    WPieces[14].load("resources/CB_Queen.obj", Texture_White, TextureID);
-    WPieces[15].load("resources/CB_King.obj", Texture_White, TextureID);
+    WPieces[14].load("resources/CB_Queen.obj", "WQ", Texture_White, TextureID);
+    WPieces[15].load("resources/CB_King.obj", "WK", Texture_White, TextureID);
     WPieces[14].setPos(0.0f, 0.0f, 6.0f);
     WPieces[15].setPos(0.0f, 0.0f, 8.0f);
     
     //Load the obj file and copy the data for all Pawns
-    BPieces[0].load("resources/CB_Pawn.obj", Texture_Black, TextureID);
+    BPieces[0].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
     BPieces[1] = BPieces[2] = BPieces[3] = BPieces[4] = BPieces[5] = BPieces[6] = BPieces[7] = BPieces[0];
     
     // Set positions for all Pawns
@@ -205,61 +213,113 @@ int main( void )
     }
     
     // Set positions for other pieces
-    BPieces[8].load("resources/CB_Rook.obj", Texture_Black, TextureID);
+    BPieces[8].load("resources/CB_Rook.obj", "BR", Texture_Black, TextureID);
     BPieces[9] = BPieces[8];
     BPieces[8].setPos(14.0f, 0.0f, 0.0f);
     BPieces[9].setPos(14.0f, 0.0f, 14.0f);
     
-    BPieces[10].load("resources/CB_KnightB.obj", Texture_Black, TextureID);
+    BPieces[10].load("resources/CB_KnightB.obj", "BN", Texture_Black, TextureID);
     BPieces[11] = BPieces[10];
     BPieces[10].setPos(14.0f, 0.0f, 2.0f);
     BPieces[11].setPos(14.0f, 0.0f, 12.0f);
     
-    BPieces[12].load("resources/CB_Bishop.obj", Texture_Black, TextureID);
+    BPieces[12].load("resources/CB_Bishop.obj", "BB", Texture_Black, TextureID);
     BPieces[13] = BPieces[12];
     BPieces[12].setPos(14.0f, 0.0f, 4.0f);
     BPieces[13].setPos(14.0f, 0.0f, 10.0f);
     
-    BPieces[14].load("resources/CB_Queen.obj", Texture_Black, TextureID);
-    BPieces[15].load("resources/CB_King.obj", Texture_Black, TextureID);
+    BPieces[14].load("resources/CB_Queen.obj", "BQ", Texture_Black, TextureID);
+    BPieces[15].load("resources/CB_King.obj", "BK", Texture_Black, TextureID);
     BPieces[14].setPos(14.0f, 0.0f, 6.0f);
     BPieces[15].setPos(14.0f, 0.0f, 8.0f);
+    
+    BoardMatrix boardMatrix;
+    boardMatrix.init(WPieces, BPieces);
+    boardMatrix.print();
     
     // Get a handle for our "LightPosition" uniform
     glUseProgram(programID);
     GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
     
-    glm::vec3 lightPos = glm::vec3(7,10,7);
-    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-
+//    glm::vec3 lightPos = glm::vec3(7,15,7);
+//    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
+    
+    // Initialize our little text library with the Holstein font
+    initText2D( "resources/Holstein.DDS" );
+    
+    static int oldState = GLFW_RELEASE, oldStateC = GLFW_RELEASE;
+    bool movingPiece = false;
+    
 	do{
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-		// Use our shader
+        // Use our shader
 		glUseProgram(programID);
         
+        glm::vec3 camPos;
+        char buffer[10];
 		// Compute the MVP matrix from keyboard and mouse input
-        computeMatricesFromInputs();
+        camPos = computeMatricesFromInputs();
         
         ProjMatrix PM;
+        PM.setLightID(LightID);
         PM.uniform(MatrixID, ViewMatrixID, ModelMatrixID);
         
         //Fixed parts - Chess Board
         for (int i = 0; i < 2; i++) {
-            drawOBJ(Board[i], PM, 0);
+            drawOBJ(Board[i], PM);
         }
         
         // Draw all the pieces
         for (int i = 0; i < 16; i++) {
-            drawOBJ(WPieces[i], PM, 1);
-            drawOBJ(BPieces[i], PM, 1);
+            drawOBJ(WPieces[i], PM);
+            drawOBJ(BPieces[i], PM);
         }
         
-        // Move one piece to y=14
-        if (WPieces[2].pos.x < 10) {
-            WPieces[2].pos.x += 0.20f;
+        // when Space is pressed the software loads the next turn and set the flag movingPiece=True indicating a new movement
+        // oldState enables the function only when the key is pressed, not while it is pressed
+        int nextStep = glfwGetKey( window, GLFW_KEY_SPACE );
+        if (nextStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece){
+            movingPiece = true;
+            //call function to read file and return which piece to move and where to move it
+//            movingPiece, pieceToMove, whereToMove = getNextTurn(boardMatrix);
+            printf("KeyPressed\n");
+            oldState = GLFW_PRESS;
         }
+        else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
+        
+        // If key C is pressed change the textures
+        int changeTexture = glfwGetKey( window, GLFW_KEY_C );
+        if (changeTexture == GLFW_PRESS && oldStateC == GLFW_RELEASE){
+            // load new textures to the variables
+            Texture_Black = loadBMP_custom("resources/DM.bmp");
+            Texture_White = loadBMP_custom("resources/LM.bmp");
+            printf("NextTexture\n");
+            oldStateC = GLFW_PRESS;
+        }
+        else if (changeTexture == GLFW_RELEASE && oldStateC == GLFW_PRESS) oldStateC = GLFW_RELEASE;
+        
+        if (movingPiece) {
+            // if there is a movement (movingPiece=True) to apply this function is called
+            // when the movement ends it update the variable (movingPiece=False)
+//            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
+            movingPiece = boardMatrix.move("b2", "b8");
+            // to implement:
+            // boardMatrix.move("a2", "a3"); double movement in case of O-O
+            if (!movingPiece) boardMatrix.print();
+        }
+        
+        //write text on screen
+        printText2D("Chess Board v0.001", 5, 585, 12);
+        sprintf(buffer, "%.2f", camPos.x);
+        printText2D(buffer, 5, 5, 12);
+        sprintf(buffer, "%.2f", camPos.y);
+        printText2D(buffer, 100, 5, 12);
+        sprintf(buffer, "%.2f", camPos.z);
+        printText2D(buffer, 200, 5, 12);
+        printText2D("Moving Piece:", 570, 5, 12);
+        printText2D(movingPiece ? "True":"False", 730, 5, 12);
         
         // Swap buffers
         glfwSwapBuffers(window);
@@ -281,6 +341,9 @@ int main( void )
 	glDeleteTextures(1, &Texture_Black);
     glDeleteTextures(1, &Texture_White);
 	glDeleteVertexArrays(1, &VertexArrayID);
+    
+    // Delete the text's VBO, the shader and the texture
+    cleanupText2D();
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
