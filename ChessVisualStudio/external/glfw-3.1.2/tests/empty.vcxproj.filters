@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\glfw-3.1.2\tests\empty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\glfw-3.1.2\deps\tinycthread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\glfw-3.1.2\deps\tinycthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\glfw-3.1.2\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{542FC322-E380-3BF3-88C9-B2DB1D54BA7C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{568D7C8C-8A7A-36C2-B443-1CA26F1978CB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

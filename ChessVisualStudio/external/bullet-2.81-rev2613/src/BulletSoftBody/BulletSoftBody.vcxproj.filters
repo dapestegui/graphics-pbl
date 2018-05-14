@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyConcaveCollisionAlgorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyHelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyRigidBodyCollisionConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftRigidCollisionAlgorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftRigidDynamicsWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftSoftCollisionAlgorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btDefaultSoftBodySolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBody.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyConcaveCollisionAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodyRigidBodyCollisionConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftRigidCollisionAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftRigidDynamicsWorld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftSoftCollisionAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSparseSDF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodySolvers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btDefaultSoftBodySolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\btSoftBodySolverVertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Nico\Desktop\All stuff\Master 2\Multimedia graphics\ogl-master\ogl-master\external\bullet-2.81-rev2613\src\BulletSoftBody\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{542FC322-E380-3BF3-88C9-B2DB1D54BA7C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{568D7C8C-8A7A-36C2-B443-1CA26F1978CB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
