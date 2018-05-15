@@ -63,9 +63,24 @@ glm::vec3 computeMatricesFromInputs(){
 	// Get mouse position
 	double xpos = 0, ypos = 0;
 	
+    // Get mouse click, left click GLFW_MOUSE_BUTTON_LEFT, for middle click GLFW_MOUSE_BUTTON_MIDDLE
     int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    
+    static bool click_down = false;
+    static double oldXpos, oldYpos;
+    
     // Compute the MVP matrix from keyboard and mouse input
     if (state == GLFW_PRESS) {
+        // border down sensor for the button, when click starts put mouse in the center to better calculations
+        if (click_down == false) {
+            // save the position to return it after the button is released
+            glfwGetCursorPos(window, &oldXpos, &oldYpos);
+            // Reset mouse position for initial frame
+            glfwSetCursorPos(window, 1024/2, 768/2);
+            click_down = true;
+        }
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         glfwGetCursorPos(window, &xpos, &ypos);
         
         // Reset mouse position for next frame
@@ -74,7 +89,17 @@ glm::vec3 computeMatricesFromInputs(){
         // Compute new orientation
         horizontalAngle += mouseSpeed * float(1024/2 - xpos );
         verticalAngle   += mouseSpeed * float( 768/2 - ypos );
-    } else glfwSetCursorPos(window, 1024/2, 768/2);
+    } else {
+        // set mouse to normal again
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        
+        // return mouse to the position when the click started
+        if (click_down == true) {
+            glfwSetCursorPos(window, float(oldXpos), float(oldYpos));
+//            printf("%f %f\n", float(oldXpos), float(oldYpos));
+            click_down = false;
+        }
+    }
     
     glm::vec3 direction(
                         7 + radius * sin(horizontalAngle),
