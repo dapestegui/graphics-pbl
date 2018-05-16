@@ -64,7 +64,7 @@ glm::vec3 computeMatricesFromInputs(){
 	double xpos = 0, ypos = 0;
 	
     // Get mouse click, left click GLFW_MOUSE_BUTTON_LEFT, for middle click GLFW_MOUSE_BUTTON_MIDDLE
-    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
     
     static bool click_down = false;
     static double oldXpos, oldYpos;
@@ -78,8 +78,10 @@ glm::vec3 computeMatricesFromInputs(){
             // Reset mouse position for initial frame
             glfwSetCursorPos(window, 1024/2, 768/2);
             click_down = true;
+            
+            // Hide the mouse and enable unlimited mouvement
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         glfwGetCursorPos(window, &xpos, &ypos);
         
@@ -89,6 +91,7 @@ glm::vec3 computeMatricesFromInputs(){
         // Compute new orientation
         horizontalAngle += mouseSpeed * float(1024/2 - xpos );
         verticalAngle   += mouseSpeed * float( 768/2 - ypos );
+        
     } else {
         // set mouse to normal again
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

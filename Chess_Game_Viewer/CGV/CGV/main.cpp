@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
-
+#include <dirent.h>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -17,11 +17,16 @@ GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+// Include IMGUI
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+#include "menu.hpp"
+
 #include "shader.hpp"
 #include "texture.hpp"
 #include "controls.hpp"
 #include "objloader.hpp"
-#include "text2D.hpp"
+//#include "text2D.hpp"
 #include "Object.cpp"
 
 //void drawOBJ(std::vector<glm::vec3> &vertices, GLuint &Texture, GLuint &TextureID, GLuint &vertexbuffer, GLuint &uvbuffer, GLuint &normalbuffer)
@@ -241,6 +246,12 @@ int main( void )
     boardMatrix.init(WPieces, BPieces);
     boardMatrix.print();
     
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplGlfwGL3_Init(window, true);
+    // Setup style
+    ImGui::StyleColorsLight();
+    
     // Get a handle for our "LightPosition" uniform
     glUseProgram(programID);
     GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
@@ -248,21 +259,24 @@ int main( void )
 //    glm::vec3 lightPos = glm::vec3(7,15,7);
 //    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     
-    // Initialize our little text library with the Holstein font
-    initText2D( "resources/Holstein.DDS" );
+//    // Initialize our little text library with the Holstein font
+//    initText2D( "resources/Holstein.DDS" );
     
-    static int oldState = GLFW_RELEASE, oldStateC = GLFW_RELEASE;
+    static bool menuOpen = false;
+    static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
     bool movingPiece = false;
     
 	do{
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        ImGui_ImplGlfwGL3_NewFrame();
+
         // Use our shader
 		glUseProgram(programID);
         
         glm::vec3 camPos;
-        char buffer[10];
+//        char buffer[10];
 		// Compute the MVP matrix from keyboard and mouse input
         camPos = computeMatricesFromInputs();
         
@@ -293,16 +307,16 @@ int main( void )
         }
         else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
         
-        // If key C is pressed change the textures
-        int changeTexture = glfwGetKey( window, GLFW_KEY_C );
-        if (changeTexture == GLFW_PRESS && oldStateC == GLFW_RELEASE){
-            // load new textures to the variables
-            Texture_Black = loadBMP_custom("resources/DM.bmp");
-            Texture_White = loadBMP_custom("resources/LM.bmp");
-            printf("NextTexture\n");
-            oldStateC = GLFW_PRESS;
-        }
-        else if (changeTexture == GLFW_RELEASE && oldStateC == GLFW_PRESS) oldStateC = GLFW_RELEASE;
+//        // If key C is pressed change the textures
+//        int changeTexture = glfwGetKey( window, GLFW_KEY_C );
+//        if (changeTexture == GLFW_PRESS && oldStateC == GLFW_RELEASE){
+//            // load new textures to the variables
+//            Texture_Black = loadBMP_custom("resources/DM.bmp");
+//            Texture_White = loadBMP_custom("resources/LM.bmp");
+//            printf("NextTexture\n");
+//            oldStateC = GLFW_PRESS;
+//        }
+//        else if (changeTexture == GLFW_RELEASE && oldStateC == GLFW_PRESS) oldStateC = GLFW_RELEASE;
         
         if (movingPiece) {
             // if there is a movement (movingPiece=True) to apply this function is called
@@ -314,17 +328,158 @@ int main( void )
             if (!movingPiece) boardMatrix.print();
         }
         
-        //write text on screen
-        printText2D("Chess Board v0.001", 5, 585, 12);
-        sprintf(buffer, "%.2f", camPos.x);
-        printText2D(buffer, 5, 5, 12);
-        sprintf(buffer, "%.2f", camPos.y);
-        printText2D(buffer, 100, 5, 12);
-        sprintf(buffer, "%.2f", camPos.z);
-        printText2D(buffer, 200, 5, 12);
-        printText2D("Moving Piece:", 570, 5, 12);
-        printText2D(movingPiece ? "True":"False", 730, 5, 12);
+        {
+            static bool b = false;
+
+            if (ImGui::BeginMainMenuBar())
+            {
+                if (ImGui::BeginMenu("File"))
+                {
+                    int menu = ShowExampleMenuFile();
+                    if (menu == 10 ) {
+                        menuOpen = true;
+                        {
+                            DIR *dir;
+                            struct dirent *ent;
+                            if ((dir = opendir ("pgn")) != NULL) {
+                                /* print all the files and directories within directory */
+                                while ((ent = readdir (dir)) != NULL) {
+                                    printf ("%s\n", ent->d_name);
+                                }
+                                closedir (dir);
+                            } else {
+                                /* could not open directory */
+                                perror ("");
+                                return EXIT_FAILURE;
+                            }
+                        }
+                    }
+                    else if (menu == 155) glfwSetWindowShouldClose(window, 1);
+                    
+                    ImGui::EndMenu();
+                }
+//                if (ImGui::BeginMenu("Edit"))
+//                {
+//                    if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+//                    if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+//                    ImGui::Separator();
+//                    if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+//                    if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+//                    if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+//                    ImGui::EndMenu();
+//                }
+                if (ImGui::BeginMenu("Options"))
+                {
+                    if (ImGui::BeginMenu("Texture"))
+                    {
+                        if (ImGui::MenuItem("Marble", NULL, b) && b == false){
+                            Texture_Black = loadBMP_custom("resources/DM.bmp");
+                            Texture_White = loadBMP_custom("resources/LM.bmp");
+                            b = !b;
+                        }
+                        if (ImGui::MenuItem("Wood", NULL, !b) && b == true){
+                            Texture_Black = loadBMP_custom("resources/DW.bmp");
+                            Texture_White = loadBMP_custom("resources/LW.bmp");
+                            b = !b;
+                        }
+                        ImGui::EndMenu();
+                    }
+                    if (ImGui::BeginMenu("Lighting"))
+                    {
+                        static float f = 70.0f;
+
+//                        if (ImGui::MenuItem("Color", NULL, false)){
+//
+//                        }
+                        if (ImGui::SliderFloat("Intensity", &f, 0.0f, 100.0f)){
+                            
+                        }
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMainMenuBar();
+            }
+        }
         
+        {
+            ImGuiWindowFlags window_flags = 0;
+            window_flags |= ImGuiWindowFlags_NoResize;
+            window_flags |= ImGuiWindowFlags_NoScrollbar;
+            window_flags |=ImGuiWindowFlags_NoTitleBar;
+            window_flags |= ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoNav;
+            ImGui::Begin("Buttons", 0, window_flags);
+            ImGui::SetWindowPos(ImVec2 (1024/2 - 1024/10, 768 - 680/15));
+            ImGui::SetWindowSize(ImVec2 (1024/5, 35));
+            if (ImGui::Button("   <<  "))
+            {
+                
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("   >   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+            {
+                movingPiece = true;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("   >>  "))
+            {
+                
+            }
+            ImGui::End();
+        }
+        
+        {
+            ImGui::SetNextWindowBgAlpha(0.2);
+            ImGui::Begin("Debug", 0);
+            ImGui::Text("Cam.X %.2f, Cam.Y %.2f, Cam.Z %.2f", camPos.x, camPos.y, camPos.z);
+            ImGui::Text("Moving piece: %s", movingPiece ? "True":"False");
+            ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        
+        if (menuOpen) {
+            ImGuiWindowFlags window_flags = 0;
+            window_flags |= ImGuiWindowFlags_NoResize;
+            window_flags |=ImGuiWindowFlags_NoTitleBar;
+            ImGui::Begin("Open File", NULL, window_flags);
+
+            ImGui::Text("Select a PGN file:");
+
+            ImGui::BeginChild("child", ImVec2(0, 180), true);
+            const char test[5] = "test";
+            if (ImGui::MenuItem(test)) {};
+            if (ImGui::MenuItem("Scrolling Text01")) {};
+            if (ImGui::MenuItem("Scrolling Text01")) {};
+            
+            ImGui::EndChild();
+
+            if (ImGui::Button("Cancel"))
+            {
+                menuOpen = false;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Open"))
+            {
+
+            }
+            ImGui::End();
+        }
+        
+//        //write text on screen
+//        printText2D("Chess Board v0.001", 5, 585, 12);
+//        sprintf(buffer, "%.2f", camPos.x);
+//        printText2D(buffer, 5, 5, 12);
+//        sprintf(buffer, "%.2f", camPos.y);
+//        printText2D(buffer, 100, 5, 12);
+//        sprintf(buffer, "%.2f", camPos.z);
+//        printText2D(buffer, 200, 5, 12);
+//        printText2D("Moving Piece:", 570, 5, 12);
+//        printText2D(movingPiece ? "True":"False", 730, 5, 12);
+        
+        
+        ImGui::Render();
+        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -346,8 +501,8 @@ int main( void )
     glDeleteTextures(1, &Texture_White);
 	glDeleteVertexArrays(1, &VertexArrayID);
     
-    // Delete the text's VBO, the shader and the texture
-    cleanupText2D();
+//    // Delete the text's VBO, the shader and the texture
+//    cleanupText2D();
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
