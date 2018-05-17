@@ -1,9 +1,15 @@
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 #include <string>
-#include <dirent.h>
+//#include <dirent.h>
+
+// Include IMGUI
+
 
 // Include GLEW
 #include <GL/glew.h>
@@ -17,9 +23,7 @@ GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-// Include IMGUI
-#include "imgui.h"
-#include "imgui_impl_glfw_gl3.h"
+
 #include "menu.hpp"
 
 #include "shader.hpp"
@@ -335,23 +339,23 @@ int main( void )
             {
                 if (ImGui::BeginMenu("File"))
                 {
-                    int menu = ShowExampleMenuFile();
+					int menu = ShowExampleMenuFile();
                     if (menu == 10 ) {
                         menuOpen = true;
                         {
-                            DIR *dir;
+                            /**DIR *dir;
                             struct dirent *ent;
                             if ((dir = opendir ("pgn")) != NULL) {
-                                /* print all the files and directories within directory */
+                                /* print all the files and directories within directory 
                                 while ((ent = readdir (dir)) != NULL) {
                                     printf ("%s\n", ent->d_name);
                                 }
                                 closedir (dir);
                             } else {
-                                /* could not open directory */
+                                /* could not open directory 
                                 perror ("");
                                 return EXIT_FAILURE;
-                            }
+                            }*/
                         }
                     }
                     else if (menu == 155) glfwSetWindowShouldClose(window, 1);

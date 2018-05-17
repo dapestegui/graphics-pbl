@@ -5,8 +5,9 @@
 //  Created by Elias Piovani on 14/05/2018.
 //  Copyright © 2018 Elias Piovani. All rights reserved.
 //
-
+#ifndef IMGUI_API
 #include "imgui.h"
+#endif
 #include "menu.hpp"
 
 int ShowExampleMenuFile()
