@@ -15,10 +15,10 @@ glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 
 glm::mat4 getViewMatrix(){
-	return ViewMatrix;
+    return ViewMatrix;
 }
 glm::mat4 getProjectionMatrix(){
-	return ProjectionMatrix;
+    return ProjectionMatrix;
 }
 
 
@@ -49,22 +49,22 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
         FoV = 160.0f;
 }
 
-glm::vec3 computeMatricesFromInputs(){
+glm::vec3 computeMatricesFromInputs(const int &mouseButton){
     
     glfwSetScrollCallback(window, scroll_callback);
     
-	// glfwGetTime is called only once, the first time this function is called
-	static double lastTime = glfwGetTime();
-
-	// Compute time difference between current and last frame
-	double currentTime = glfwGetTime();
-//    float deltaTime = float(currentTime - lastTime);
-
-	// Get mouse position
-	double xpos = 0, ypos = 0;
-	
+    // glfwGetTime is called only once, the first time this function is called
+    static double lastTime = glfwGetTime();
+    
+    // Compute time difference between current and last frame
+    double currentTime = glfwGetTime();
+    //    float deltaTime = float(currentTime - lastTime);
+    
+    // Get mouse position
+    double xpos = 0, ypos = 0;
+    
     // Get mouse click, left click GLFW_MOUSE_BUTTON_LEFT, for middle click GLFW_MOUSE_BUTTON_MIDDLE
-    int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
+    int state = glfwGetMouseButton(window, mouseButton);
     
     static bool click_down = false;
     static double oldXpos, oldYpos;
@@ -82,7 +82,7 @@ glm::vec3 computeMatricesFromInputs(){
             // Hide the mouse and enable unlimited mouvement
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-
+        
         glfwGetCursorPos(window, &xpos, &ypos);
         
         // Reset mouse position for next frame
@@ -99,7 +99,7 @@ glm::vec3 computeMatricesFromInputs(){
         // return mouse to the position when the click started
         if (click_down == true) {
             glfwSetCursorPos(window, float(oldXpos), float(oldYpos));
-//            printf("%f %f\n", float(oldXpos), float(oldYpos));
+            //            printf("%f %f\n", float(oldXpos), float(oldYpos));
             click_down = false;
         }
     }
@@ -109,18 +109,18 @@ glm::vec3 computeMatricesFromInputs(){
                         7 + radius * verticalAngle,
                         7 + radius * cos(horizontalAngle)
                         );
-	
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 300.0f);
-	// Camera matrix
+    
+    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 300.0f);
+    // Camera matrix
     //ViewMatrix       = glm::lookAt(position, position+direction, up);
     ViewMatrix       = glm::lookAt(position+direction, glm::vec3(7,0,7), glm::vec3(0,1,0));
-                                // Camera is here
-								// and looks here : at the same position, plus "direction"
-                                // Head is up (set to 0,-1,0 to look upside-down)
+    // Camera is here
+    // and looks here : at the same position, plus "direction"
+    // Head is up (set to 0,-1,0 to look upside-down)
     
-	// For the next frame, the "last time" will be "now"
-	lastTime = currentTime;
+    // For the next frame, the "last time" will be "now"
+    lastTime = currentTime;
     
     //printf("Camera Position %f", direction.x);
     return direction;

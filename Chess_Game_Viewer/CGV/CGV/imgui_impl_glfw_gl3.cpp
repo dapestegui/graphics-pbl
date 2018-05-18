@@ -37,7 +37,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#ifndef IMGUI_API
 #include "imgui.h"
+#endif
 #include "imgui_impl_glfw_gl3.h"
 #include "imgui_draw.cpp"
 

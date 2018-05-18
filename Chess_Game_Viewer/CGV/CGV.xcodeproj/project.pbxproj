@@ -16,9 +16,7 @@
 		2D4D41AE208D1F59000A36B0 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D4D41AD208D1F59000A36B0 /* OpenGL.framework */; };
 		2D4D41B6208D224A000A36B0 /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D4D41B5208D224A000A36B0 /* libGLEW.2.1.0.dylib */; };
 		2D4D41B8208D2258000A36B0 /* libglfw.3.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D4D41B7208D2258000A36B0 /* libglfw.3.2.dylib */; };
-		2D4D41D9208E51E4000A36B0 /* text2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D4D41D8208E51E4000A36B0 /* text2D.cpp */; };
 		2D6BFF1220AC293300C62E38 /* imgui_impl_glfw_gl3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D6BFF1020AC293300C62E38 /* imgui_impl_glfw_gl3.cpp */; };
-		2D6BFF1520AC29C500C62E38 /* menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D6BFF1420AC29C500C62E38 /* menu.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -68,14 +66,8 @@
 		2D4D41D2208D252F000A36B0 /* CB_King.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB_King.obj; sourceTree = "<group>"; };
 		2D4D41D5208DE789000A36B0 /* CB_KnightB.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CB_KnightB.obj; sourceTree = "<group>"; };
 		2D4D41D6208E51DC000A36B0 /* Holstein.DDS */ = {isa = PBXFileReference; lastKnownFileType = file; path = Holstein.DDS; sourceTree = "<group>"; };
-		2D4D41D7208E51E4000A36B0 /* text2D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = text2D.hpp; sourceTree = "<group>"; };
-		2D4D41D8208E51E4000A36B0 /* text2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text2D.cpp; sourceTree = "<group>"; };
-		2D4D41DA208E5319000A36B0 /* TextVertexShader.vertexshader */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TextVertexShader.vertexshader; sourceTree = "<group>"; };
-		2D4D41DB208E5319000A36B0 /* TextVertexShader.fragmentshader */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TextVertexShader.fragmentshader; sourceTree = "<group>"; };
 		2D6BFF1020AC293300C62E38 /* imgui_impl_glfw_gl3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imgui_impl_glfw_gl3.cpp; sourceTree = "<group>"; };
 		2D6BFF1120AC293300C62E38 /* imgui_impl_glfw_gl3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imgui_impl_glfw_gl3.h; sourceTree = "<group>"; };
-		2D6BFF1320AC29C500C62E38 /* menu.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = menu.hpp; sourceTree = "<group>"; };
-		2D6BFF1420AC29C500C62E38 /* menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = menu.cpp; sourceTree = "<group>"; };
 		2D6BFF1820AC431900C62E38 /* grafl_jones_2018.pgn */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = grafl_jones_2018.pgn; path = pgn/grafl_jones_2018.pgn; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -116,12 +108,8 @@
 		2D4D418D208D1B98000A36B0 /* CGV */ = {
 			isa = PBXGroup;
 			children = (
-				2D6BFF1420AC29C500C62E38 /* menu.cpp */,
-				2D6BFF1320AC29C500C62E38 /* menu.hpp */,
 				2D6BFF1020AC293300C62E38 /* imgui_impl_glfw_gl3.cpp */,
 				2D6BFF1120AC293300C62E38 /* imgui_impl_glfw_gl3.h */,
-				2D4D41D8208E51E4000A36B0 /* text2D.cpp */,
-				2D4D41D7208E51E4000A36B0 /* text2D.hpp */,
 				2D4D41A5208D1EBD000A36B0 /* Object.cpp */,
 				2D4D41A6208D1EBD000A36B0 /* Object.hpp */,
 				2D4D419D208D1D0C000A36B0 /* shader.cpp */,
@@ -155,8 +143,6 @@
 		2D4D41BB208D2475000A36B0 /* shaders */ = {
 			isa = PBXGroup;
 			children = (
-				2D4D41DB208E5319000A36B0 /* TextVertexShader.fragmentshader */,
-				2D4D41DA208E5319000A36B0 /* TextVertexShader.vertexshader */,
 				2D4D41A2208D1D0C000A36B0 /* TransformVertexShader.vertexshader */,
 				2D4D41A0208D1D0C000A36B0 /* TextureFragmentShader.fragmentshader */,
 			);
@@ -249,12 +235,10 @@
 			files = (
 				2D6BFF1220AC293300C62E38 /* imgui_impl_glfw_gl3.cpp in Sources */,
 				2D4D4196208D1C24000A36B0 /* main.cpp in Sources */,
-				2D6BFF1520AC29C500C62E38 /* menu.cpp in Sources */,
 				2D4D419C208D1CBA000A36B0 /* objloader.cpp in Sources */,
 				2D4D41A7208D1EBD000A36B0 /* Object.cpp in Sources */,
 				2D4D41A3208D1D0C000A36B0 /* shader.cpp in Sources */,
 				2D4D419B208D1CBA000A36B0 /* controls.cpp in Sources */,
-				2D4D41D9208E51E4000A36B0 /* text2D.cpp in Sources */,
 				2D4D41A4208D1D0C000A36B0 /* texture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
