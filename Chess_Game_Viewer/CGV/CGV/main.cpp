@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
-//#include <dirent.h>
+#ifdef _MSC_VER
+#include "dirent.h"
+#else
+#include <dirent.h>
+#endif
 
 // Include GLEW
 #include <GL/glew.h>
@@ -451,34 +455,34 @@ int main( void )
             char file[1024];
             
             // read folder and get all files .pgn inside that
-//            {
-//                // read files in the directory PGN
-//                DIR *dir;
-//                struct dirent *ent;
-//                if ((dir = opendir ("pgn")) != NULL) {
-//                    // print all the files .pgn inside the menu item
-//                    while ((ent = readdir (dir)) != NULL) {
-//
-//                        // extract extension of file
-//                        char * ext;
-//                        ext = strtok(ent->d_name, ".");
-//                        ext = strtok(NULL, ".");
-//                        // if contains extension .pgn create item in the list
-//                        if (ext != NULL && strcmp(ext, "pgn") == 0) {
-//                            if(ImGui::MenuItem(ent->d_name))
-//                            {
-//                                printf("%s\n", ent->d_name);
-//                                memcpy ( file, ent->d_name, strlen(ent->d_name)+1 );
-//                            }
-//                        }
-//                    }
-//                    closedir (dir);
-//                } else {
-//                    // could not open directory
-//                    perror ("Could not open directory pgn");
-//                    return EXIT_FAILURE;
-//                }
-//            }
+            {
+                // read files in the directory PGN
+                DIR *dir;
+                struct dirent *ent;
+                if ((dir = opendir ("pgn")) != NULL) {
+                    // print all the files .pgn inside the menu item
+                    while ((ent = readdir (dir)) != NULL) {
+
+                        // extract extension of file
+                        char * ext;
+                        ext = strtok(ent->d_name, ".");
+                        ext = strtok(NULL, ".");
+                        // if contains extension .pgn create item in the list
+                        if (ext != NULL && strcmp(ext, "pgn") == 0) {
+                            if(ImGui::MenuItem(ent->d_name))
+                            {
+                                printf("%s\n", ent->d_name);
+                                memcpy ( file, ent->d_name, strlen(ent->d_name)+1 );
+                            }
+                        }
+                    }
+                    closedir (dir);
+                } else {
+                    // could not open directory
+                    perror ("Could not open directory pgn");
+                    return EXIT_FAILURE;
+                }
+            }
             
             ImGui::EndChild();
             // when cancel is pressed, just close the window
