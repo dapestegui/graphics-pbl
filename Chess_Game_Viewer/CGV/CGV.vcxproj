@@ -118,23 +118,21 @@
   <ItemGroup>
     <ClCompile Include="cgv\controls.cpp" />
     <ClCompile Include="CGV\imgui.cpp" />
-    <ClCompile Include="CGV\imgui_demo.cpp" />
+    <ClCompile Include="CGV\imgui_draw.cpp" />
     <ClCompile Include="CGV\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="cgv\main.cpp" />
-    <ClCompile Include="CGV\menu.cpp" />
     <ClCompile Include="cgv\Object.cpp" />
     <ClCompile Include="cgv\objloader.cpp" />
     <ClCompile Include="cgv\shader.cpp" />
-    <ClCompile Include="cgv\text2D.cpp" />
     <ClCompile Include="cgv\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cgv\controls.hpp" />
-    <ClInclude Include="CGV\menu.hpp" />
+    <ClInclude Include="CGV\imgui.h" />
+    <ClInclude Include="CGV\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="cgv\Object.hpp" />
     <ClInclude Include="cgv\objloader.hpp" />
     <ClInclude Include="cgv\shader.hpp" />
-    <ClInclude Include="cgv\text2D.hpp" />
     <ClInclude Include="cgv\texture.hpp" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

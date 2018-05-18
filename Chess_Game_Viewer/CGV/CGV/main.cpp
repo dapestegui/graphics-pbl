@@ -1,3 +1,4 @@
+
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +19,11 @@ GLFWwindow* window;
 using namespace glm;
 
 // Include IMGUI
+
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
+
+
 
 #include "shader.hpp"
 #include "texture.hpp"

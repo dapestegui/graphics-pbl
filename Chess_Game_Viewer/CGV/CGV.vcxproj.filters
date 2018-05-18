@@ -30,22 +30,16 @@
     <ClCompile Include="cgv\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cgv\text2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cgv\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CGV\imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CGV\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CGV\imgui_impl_glfw_gl3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CGV\menu.cpp">
+    <ClCompile Include="CGV\imgui_draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,16 +56,16 @@
     <ClInclude Include="cgv\shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cgv\text2D.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cgv\texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CGV\menu.hpp">
+    <ClInclude Include="CGV\imgui_impl_glfw_gl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CGV\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
