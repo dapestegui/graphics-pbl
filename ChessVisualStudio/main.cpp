@@ -8,8 +8,8 @@
 #include <iostream>
 #include <fstream>
 // Include GLEW
-#include <GL/glew.h>
-
+//#include <GL/glew.h>
+#include "GL/glew.h"
 // Include GLFW
 #include <GLFW/glfw3.h>
 GLFWwindow* window;
@@ -19,7 +19,7 @@ GLFWwindow* window;
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#include "shader.hpp"
+#include "./classes/shader.hpp"
 #include "texture.hpp"
 #include "controls.hpp"
 #include "objloader.hpp"
@@ -184,8 +184,9 @@ int main(void)
 	WPieces[9] = WPieces[8];
 	WPieces[8].setPos(0.0f, 0.0f, 0.0f);
 	WPieces[9].setPos(0.0f, 0.0f, 14.0f);
-
-	WPieces[10].load("C:\\Users\\Nico\\Desktop\\All stuff\\Master 2\\Multimedia graphics\\cosas compiladas\\CB_Knight.obj", Texture_White, TextureID);
+	//
+	//WPieces[10].load("C:\\Users\\Nico\\Desktop\\All stuff\\Master 2\\Multimedia graphics\\cosas compiladas\\CB_Knight.obj", Texture_White, TextureID);
+	WPieces[10].load(".//CB_Knight.obj", Texture_White, TextureID);
 	WPieces[11] = WPieces[10];
 	WPieces[10].setPos(0.0f, 0.0f, 2.0f);
 	WPieces[11].setPos(0.0f, 0.0f, 12.0f);
@@ -238,7 +239,7 @@ int main(void)
 	glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
 	//READ (in progress)
-
+	/*
 	std::ifstream ifs("C:\\Users\\Nico\\Desktop\\All stuff\\\Master 2\\ChessVisualStudio\\game.txt");
 	if (ifs.is_open()) {
 		// print file:
@@ -252,7 +253,7 @@ int main(void)
 
 			while (ifs.get() != ' ') {
 				turn[5] = ifs.get();
-				Move move = (' ', NULL, NULL);
+				
 			}
 			//std::cout << c;
 			
@@ -262,6 +263,7 @@ int main(void)
 		// show message:
 		std::cout << "Error opening file";
 	}
+	*/
 	//END READ(in progress)
 
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 // Include GLFW
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 extern GLFWwindow* window; // The "extern" keyword here is to access the variable "window" declared in main.cpp.
 
 // Include GLM

@@ -6,7 +6,7 @@
 
 
 // Include GLEW
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 // Include GLFW
 #include <GLFW/glfw3.h>
@@ -251,6 +251,11 @@ int main( void )
     static int oldState = GLFW_RELEASE, oldStateC = GLFW_RELEASE;
     bool movingPiece = false;
     
+	
+
+
+	StepsArray ax = boardMatrix.Read_Steps("C:\\Users\\Nico\\Desktop\\All stuff\\Master 2\\Multimedia graphics\\ChessVisualStudio\\graphics-pbl\\Chess_Game_Viewer\\CGV\\grafl_jones_2018.pgn");
+
 	do{
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
