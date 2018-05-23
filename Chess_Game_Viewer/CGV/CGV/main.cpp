@@ -100,8 +100,10 @@ int main( void )
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#ifndef _WIN32
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Chess Game Viewer", NULL, NULL); //1024, 768
@@ -254,9 +256,10 @@ int main( void )
 	
 
 
-	StepsArray ax = boardMatrix.Read_Steps("C:\\Users\\Nico\\Desktop\\All stuff\\Master 2\\Multimedia graphics\\ChessVisualStudio\\graphics-pbl\\Chess_Game_Viewer\\CGV\\grafl_jones_2018.pgn");
+	StepsArray ax = boardMatrix.Read_Steps("./grafl_jones_2018.pgn");
 
-	do{
+	//std::cout << "StepsArray achieved " << ax.index << std::endl;
+	do {
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
@@ -307,10 +310,21 @@ int main( void )
         else if (changeTexture == GLFW_RELEASE && oldStateC == GLFW_PRESS) oldStateC = GLFW_RELEASE;
         
         if (movingPiece) {
+
             // if there is a movement (movingPiece=True) to apply this function is called
             // when the movement ends it update the variable (movingPiece=False)
 //            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
-            movingPiece = boardMatrix.move("b2", "b8");
+			/*Step activeStep = ax.steps[ax.active];
+			std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+			if (activeStep.castling) {
+				movingPiece = boardMatrix.castling(activeStep.pieceStart, activeStep.pieceEnd, activeStep.rookStart, activeStep.rookEnd);
+			} else if (activeStep.promotion) {
+
+			} else {
+				std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+				movingPiece = boardMatrix.move(activeStep.pieceStart, activeStep.pieceEnd);
+			} */
+			movingPiece = boardMatrix.move("b2", "c6");
             // to implement:
             // boardMatrix.move("a2", "a3"); double movement in case of O-O
             if (!movingPiece) boardMatrix.print();
