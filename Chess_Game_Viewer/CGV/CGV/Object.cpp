@@ -31,7 +31,7 @@ private:
     
 public:
 //    char path[10];
-    char *pieceType;
+    char pieceType[2];
     bool firstMove = true;
     std::vector<glm::vec3> v;
     GLuint vb;
@@ -40,10 +40,17 @@ public:
     const GLuint *texture;
     const GLuint *textureID;
     glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    Object cloneLogic() {
+        Object object;
+        memcpy(object.pieceType, pieceType, 2);
+        object.firstMove = firstMove;
+        return object;
+    }
     
     void load(const char *path, char *piecetype, const GLuint &Texture, const GLuint &TextureID)
     {
-        pieceType = piecetype;
+        memcpy(pieceType, piecetype, 2);
         
         // implement if obj was loaded well
         bool wParts = loadOBJ(path, v, uvs, n);
@@ -169,9 +176,6 @@ public:
         for (int j = 0; j < 8; j++) {
             Matrix[1][j] = &WhitePieces[j];
             Matrix[6][j] = &BlackPieces[j];
-
-			SimulationMatrix[1][j] = &WhitePieces[j];
-			SimulationMatrix[6][j] = &BlackPieces[j];
         }
 
         Matrix[0][0] = &WhitePieces[8];
@@ -192,23 +196,14 @@ public:
         Matrix[7][6] = &BlackPieces[11];
         Matrix[7][7] = &BlackPieces[9];
 
-		SimulationMatrix[0][0] = &WhitePieces[8];
-		SimulationMatrix[0][1] = &WhitePieces[10];
-		SimulationMatrix[0][2] = &WhitePieces[12];
-		SimulationMatrix[0][3] = &WhitePieces[14];
-		SimulationMatrix[0][4] = &WhitePieces[15];
-		SimulationMatrix[0][5] = &WhitePieces[13];
-		SimulationMatrix[0][6] = &WhitePieces[11];
-		SimulationMatrix[0][7] = &WhitePieces[9];
-
-		SimulationMatrix[7][0] = &BlackPieces[8];
-		SimulationMatrix[7][1] = &BlackPieces[10];
-		SimulationMatrix[7][2] = &BlackPieces[12];
-		SimulationMatrix[7][3] = &BlackPieces[14];
-		SimulationMatrix[7][4] = &BlackPieces[15];
-		SimulationMatrix[7][5] = &BlackPieces[13];
-		SimulationMatrix[7][6] = &BlackPieces[11];
-		SimulationMatrix[7][7] = &BlackPieces[9];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (Matrix[i][j]) {
+                    SimulationMatrix[i][j] = new Object();
+                    *SimulationMatrix[i][j] = Matrix[i][j]->cloneLogic();
+                }
+            }
+        }
     }
     
     void print()
@@ -655,36 +650,28 @@ public:
 				// Kill move diagonal
 				if (color == 'W') {
 					std::cout << "w KILL" << std::endl;
-					std::cout << (char)(destination[1] - 1) << (char)(destination[0] + 1) << std::endl;
-					if (SimulationMatrix[destination[1] - 1 - '1'][destination[0] + 1 - 'a'] &&
-						(SimulationMatrix[destination[1] - '1'][destination[0] - 'a']->pieceType[0] == 'B')) {
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] + 1;
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] - 1;
-						l++;
-					}
-					std::cout << (char)(destination[1] - 1) << (char)(destination[0] - 1) << std::endl;
+					std::cout << (char)(destination[1]) << (char)(destination[0]) << std::endl;
 					if (SimulationMatrix[destination[1] - '1'][destination[0] - 'a'] &&
 						(SimulationMatrix[destination[1] - '1'][destination[0] - 'a']->pieceType[0] == 'B')) {
 						posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] - 1;
 						posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] - 1;
 						l++;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] + 1;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] - 1;
+            l++;
 					}
 				} else {
 					std::cout << "b KILL" << std::endl;
-					std::cout << (char)(destination[1] + 1) << (char)(destination[0] + 1) << std::endl;
+					std::cout << (char)(destination[1]) << (char)(destination[0]) << std::endl;
 					///std::cout << SimulationMatrix[destination[1] + 1 - '1'][destination[0] + 1 - 'a'] << std::endl;
 					if (SimulationMatrix[destination[1] - '1'][destination[0] - 'a'] &&
 						(SimulationMatrix[destination[1] - '1'][destination[0] - 'a']->pieceType[0] == 'W')) {
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] + 1;
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] + 1;
-						l++;
-					}
-					std::cout << (char)(destination[1] - 1) << (char)(destination[0] + 1) << std::endl;
-					if (SimulationMatrix[destination[1] - '1'][destination[0] - 'a'] &&
-						(SimulationMatrix[destination[1] - '1'][destination[0] - 'a']->pieceType[0] == 'W')) {
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] - 1;
-						posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] + 1;
-						l++;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] - 1;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] + 1;
+            l++;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0] + 1;
+            posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] + 1;
+            l++;
 					}
 				}
 				std::cout << "after KILL" << std::endl;
@@ -762,10 +749,8 @@ public:
 		//simulateMove(startPos, endPos);
 		std::cout << "simulatePromotion " << endPos[0] << endPos[1] << "=" << piece << std::endl;
 		std::cout << SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] << std::endl;
-		Object o;
-		o.pos = SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pos;
-		o.pieceType = piece;
-		*(SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']) = o;
+        SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[0] = piece[0];
+        SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] = piece[1];
 		//strcpy(SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType + 1, &piece);
 		//SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] = piece;
 	}
@@ -808,7 +793,7 @@ public:
 		//Create an array of possible initial positions
 		StepsArray posibilitiesStepsArrayAUX = GetPosibilities(destination, piece, color, info == 'x', SimulationMatrix);
 		std::cout << posibilitiesStepsArrayAUX.index << std::endl;
-	
+
 		//For every possible position check if the piece is in that position to verify (also need the infomation if its a kill movement(for pawns)
 		//(having an x in the step) and if the piece is B or W (first step or second step))
 		int counter = 0;
@@ -1053,7 +1038,7 @@ public:
 
 					// Return a step object with initial position and destination position
 					char color = turn % 2 == 1 ? 'W' : 'B';
-					Step step = GetStep(step_array[k], color);
+                    Step step = GetStep(step_array[k], color);
 
 					steps_array_return.steps[steps_index] = step;
 					steps_index++;
