@@ -138,8 +138,8 @@ class Step {
 public:
 	char pieceStart[3];
 	char pieceEnd[3];
-	bool castling;
-	bool promotion;
+	bool castling = false;
+	bool promotion = false;
 	char rookStart[3];
 	char rookEnd[3];
 	char promotedTo;
@@ -233,13 +233,34 @@ public:
 	bool castling(const char kingStart[3], const char kingEnd[3], const char rookStart[3], const char rookEnd[3]) {
 		return move(kingStart, kingEnd) || move(rookStart, rookEnd);
 	}
+	const char* pathToObj(char promotedTo) {
+		switch (promotedTo) {
+		case 'Q':
+			return "resources/CB_Queen.obj";
+		case 'R':
+			return "resources/CB_Rook.obj";
+		case 'N':
+			return "resources/CB_Knight.obj";
+		case 'B':
+			return "resources/CB_Bishop.obj";
+		default:
+			return "resources/CB_Pawn.obj";
+		}
+	}
 
 	bool promotion(char pieceStart[3], char pieceEnd[3], char promotedTo) {
-
+		bool moving = move(pieceStart, pieceEnd);
+		if (!moving) {
+			Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
+			Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
+			(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+		}
+		return moving;
 	}
     
-    bool move(const char pieceStart[3], const char pieceEnd[3])
+    bool move(const char pieceStart[2], const char pieceEnd[2])
     {
+		std::cout << pieceStart[0] << pieceStart[1] << " to " << pieceEnd[0] << pieceEnd[1] << std::endl;
         int initPosX = 0, initPosZ = 0, finalPosX = 0, finalPosZ = 0;
         
         movingPiece = true;
@@ -358,10 +379,8 @@ public:
                 break;
         }
         
+		std::cout << initPosX << initPosZ << " to " << finalPosX << finalPosZ << std::endl;
 //        float step = 0.15f;
-        float speed = 20.0f;
-        float stepX = float(finalPosX - initPosX)/speed;
-        float stepZ = float(finalPosZ - initPosZ)/speed;
         
         //implementation - verify if contains s piece on pieceStart!
         if (Matrix[initPosX][initPosZ] == NULL) {
@@ -374,21 +393,26 @@ public:
         float initDist = sqrt(pow((finalPosX * 2.0f) - (initPosX * 2.0f), 2.0) +
                     pow((finalPosZ * 2.0f) - (initPosZ * 2.0f), 2.0));
         
+		float speed = 10.0f;
+		float stepX = float(finalPosX - initPosX) / speed;
+		float stepZ = float(finalPosZ - initPosZ) / speed;
+
         if (dist > 0.0002) {
-            Matrix[int(initPosX)][int(initPosZ)]->pos.x += stepX;
+            Matrix[initPosX][initPosZ]->pos.x += stepX;
             // Only Knights can jump over other piece, so applies an arc movement to the Knights only
             if (Matrix[initPosX][initPosZ]->pieceType[1] == 'N') {
                 float y = sin(((3.14159)/initDist) * (initDist - dist));
-                Matrix[int(initPosX)][int(initPosZ)]->pos.y = y * 4.0;
+                Matrix[initPosX][initPosZ]->pos.y = y * 4.0;
             }
-            Matrix[int(initPosX)][int(initPosZ)]->pos.z += stepZ;
+            Matrix[initPosX][initPosZ]->pos.z += stepZ;
         }
         else
         {
-            Matrix[int(initPosX)][int(initPosZ)]->pos.y = 0.0;
+            Matrix[initPosX][initPosZ]->pos.y = 0.0;
             //update boardMatrix with new position of the piece
             // if piece killed another pice put it aside of the table
             if (Matrix[finalPosX][finalPosZ] != NULL) {
+				std::cout << "Capture " << finalPosX << " " << finalPosZ << " " << Matrix[finalPosX][finalPosZ]->pieceType[0] << Matrix[finalPosX][finalPosZ]->pieceType[1] << std::endl;
                 // if piece is black piece goes to the right of the board, if is white goes to the left
                 if (Matrix[finalPosX][finalPosZ]->pieceType[0] == 'B') {
                     Matrix[finalPosX][finalPosZ]->pos.x = -2.0f + nBPiecesDead; // -2.0f 18.0f
@@ -397,9 +421,9 @@ public:
                 }
                 else
                 {
-                    Matrix[finalPosX][finalPosZ]->pos.x = 16.0f + nWPiecesDead;
+                    Matrix[finalPosX][finalPosZ]->pos.x = 16.0f - nWPiecesDead;
                     Matrix[finalPosX][finalPosZ]->pos.z = -4.0f;
-                    nBPiecesDead++;
+                    nWPiecesDead++;
                 }
                 
             }
@@ -460,14 +484,6 @@ public:
 			posibilitiesStepsArrayAUX.steps[7].pieceStart[0] = destination[0] + 1;
 			posibilitiesStepsArrayAUX.steps[7].pieceStart[1] = destination[1] + 2;
 
-			//Add them to array
-			//posibilitiesStepsArrayAUX.steps[1] = pos2; 
-			//posibilitiesStepsArrayAUX.steps[2] = pos3; 
-			//posibilitiesStepsArrayAUX.steps[3] = pos4; 
-			//posibilitiesStepsArrayAUX.steps[4] = pos5; 
-			//posibilitiesStepsArrayAUX.steps[5] = pos6; 
-			//posibilitiesStepsArrayAUX.steps[6] = pos7; 
-			//posibilitiesStepsArrayAUX.steps[7] = pos8;
 			posibilitiesStepsArrayAUX.index = 7;
 
 			break;
@@ -681,50 +697,6 @@ public:
 			//posibilitiesStepsArrayAUX.steps[0] = pos1;posibilitiesStepsArrayAUX.steps[1] = pos2; posibilitiesStepsArrayAUX.steps[2] = pos3; posibilitiesStepsArrayAUX.steps[3] = pos4; posibilitiesStepsArrayAUX.steps[4] = pos5; posibilitiesStepsArrayAUX.steps[5] = pos6; posibilitiesStepsArrayAUX.steps[6] = pos7; posibilitiesStepsArrayAUX.steps[7] = pos8;
 			std::cout << "l = " << l << std::endl;
 			posibilitiesStepsArrayAUX.index = l - 1;
-
-			// Print possible moves
-			/*std::cout <<"Possible PAWN INIT:";
-			std::string a, b;
-			std::cout << '\n';
-			a = pos1.pieceStart[0];
-			b = pos1.pieceStart[1];
-			std::cout << a;
-			std::cout << b+'\n';
-
-			a = pos2.pieceStart[0];
-			b = pos2.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos3.pieceStart[0];
-			b = pos3.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos4.pieceStart[0];
-			b = pos4.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos5.pieceStart[0];
-			b = pos5.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos6.pieceStart[0];
-			b = pos6.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos7.pieceStart[0];
-			b = pos7.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';
-
-			a = pos8.pieceStart[0];
-			b = pos8.pieceStart[1];
-			std::cout << a;
-			std::cout << b + '\n';*/
 			break;
 		}
 		
@@ -745,14 +717,10 @@ public:
 		}
 	}
 
-	void simulatePromotion(char endPos[], char *piece) {
-		//simulateMove(startPos, endPos);
+	void simulatePromotion(char endPos[], char piece) {
 		std::cout << "simulatePromotion " << endPos[0] << endPos[1] << "=" << piece << std::endl;
 		std::cout << SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] << std::endl;
-        SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[0] = piece[0];
-        SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] = piece[1];
-		//strcpy(SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType + 1, &piece);
-		//SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] = piece;
+        SimulationMatrix[endPos[1] - '1'][endPos[0] - 'a']->pieceType[1] = piece;
 	}
 
 	bool checkIfInitPos(char piece, char color, bool *directions, char startPos[], int idx, int d) {
@@ -771,21 +739,20 @@ public:
 		}
 	}
 	void simulateMove(char from[], char to[]) {
-		printSimulation();
-		std::cout << "simulateMove" << std::endl;
-		//std::cout << SimulationMatrix[from[0] - 'a'][from[1] - '1']->pos.z << std::endl;
-		//std::cout << SimulationMatrix[from[0] - 'a'][from[1] - '1']->pos.x << std::endl;
-		std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z << std::endl;
-		std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x << std::endl;
-		int posZ = SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z;
-		int posX = SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x;
-		SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z = to[0] - 'a' + 1;
-		SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x = to[1] - '1' + 1;
-		std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z << std::endl;
-		std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x << std::endl;
+		//printSimulation();
+		//std::cout << "simulateMove" << std::endl;
+		//std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z << std::endl;
+		//std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x << std::endl;
+		//int posZ = SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z;
+		//int posX = SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x;
+		//SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z = to[0] - 'a' + 1;
+		//SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x = to[1] - '1' + 1;
+		//std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.z << std::endl;
+		//std::cout << SimulationMatrix[from[1] - '1'][from[0] - 'a']->pos.x << std::endl;
 		SimulationMatrix[to[1] - '1'][to[0] - 'a'] = SimulationMatrix[from[1] - '1'][from[0] - 'a'];
+		//SimulationMatrix[from[1] - '1'][from[0] - 'a'];
 		SimulationMatrix[from[1] - '1'][from[0] - 'a'] = NULL;
-		printSimulation();
+		//printSimulation();
 	}
 
 	std::string Know_init_pos(char destination[], char piece, char color, char info, char promotedTo) {
@@ -802,7 +769,7 @@ public:
 		bool directions[9] = { true, true, true, true, true, true, true, true };
 
 		for (int i = 0; i <= posibilitiesStepsArrayAUX.index; i++) {
-			std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
+			//std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
 			char x = posibilitiesStepsArrayAUX.steps[i].pieceStart[0];
 			char y = posibilitiesStepsArrayAUX.steps[i].pieceStart[1];
 			//Now only prints what we found in that possible initial position
@@ -815,9 +782,9 @@ public:
 							counter++;
 							good = i;
 						}
-						std::cout << "directions: " << directions[0] << directions[1] << directions[2] << directions[3] << directions[4] << directions[5] << directions[6] << directions[7] << directions[8] << std::endl;
+						//std::cout << "directions: " << directions[0] << directions[1] << directions[2] << directions[3] << directions[4] << directions[5] << directions[6] << directions[7] << directions[8] << std::endl;
 					} else {
-						std::cout << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
+						//std::cout << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
 						if ((SimulationMatrix[y - '1'][x - 'a']->pieceType[1] == piece) &&
 							(SimulationMatrix[y - '1'][x - 'a']->pieceType[0] == color)) {
 							if ((info != 'x') && (info != '\0')) {
@@ -846,13 +813,8 @@ public:
 			std::cout << "AHR... More than one posibility is correct :/" << std::endl;
 			throw "AHR... More than one posibility is correct :/";
 		}
-		if (promotedTo) { // TODO needs change
-			if (color == 'B' && promotedTo == 'Q') {
-				simulatePromotion(destination, "BQ");
-			}
-			if (color == 'W' && promotedTo == 'Q') {
-				simulatePromotion(destination, "WQ");
-			}
+		if (promotedTo) {
+			simulatePromotion(destination, promotedTo);
 		}
 		return posibilitiesStepsArrayAUX.steps[good].pieceStart;
 	}
@@ -1008,6 +970,12 @@ public:
 					std::cout << "DONE!" << std::endl;
 					ifs.close();
 					std::cout << steps_array_return.index << std::endl;
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							delete(SimulationMatrix[i][j]);
+							SimulationMatrix[i][j] = NULL;
+						}
+					}
 					return steps_array_return;
 				}
 

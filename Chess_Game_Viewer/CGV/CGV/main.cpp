@@ -314,20 +314,29 @@ int main( void )
             // if there is a movement (movingPiece=True) to apply this function is called
             // when the movement ends it update the variable (movingPiece=False)
 //            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
-			/*Step activeStep = ax.steps[ax.active];
-			std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
-			if (activeStep.castling) {
-				movingPiece = boardMatrix.castling(activeStep.pieceStart, activeStep.pieceEnd, activeStep.rookStart, activeStep.rookEnd);
-			} else if (activeStep.promotion) {
-
-			} else {
-				std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
-				movingPiece = boardMatrix.move(activeStep.pieceStart, activeStep.pieceEnd);
-			} */
-			movingPiece = boardMatrix.move("b2", "c6");
-            // to implement:
-            // boardMatrix.move("a2", "a3"); double movement in case of O-O
-            if (!movingPiece) boardMatrix.print();
+			if (ax.active < ax.index) {
+				Step activeStep = ax.steps[ax.active];
+				std::cout << "active = " << ax.active << std::endl;
+				//std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+				if (activeStep.castling) {
+					//std::cout << "castling " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.castling(activeStep.pieceStart, activeStep.pieceEnd, activeStep.rookStart, activeStep.rookEnd);
+				}
+				else if (activeStep.promotion) {
+					//std::cout << "promotion " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.promotion(activeStep.pieceStart, activeStep.pieceEnd, activeStep.promotedTo);
+				}
+				else {
+					//std::cout << "move " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.move(activeStep.pieceStart, activeStep.pieceEnd);
+				}
+				//std::cout << "movingPiece = " << movingPiece << std::endl;
+				//movingPiece = boardMatrix.move("b2", "c6");
+				if (!movingPiece) {
+					//boardMatrix.print();
+					ax.active++;
+				}
+			}
         }
         
         //write text on screen
