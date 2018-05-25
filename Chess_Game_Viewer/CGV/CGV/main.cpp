@@ -268,6 +268,7 @@ int main( void )
     static int mouseButton = GLFW_MOUSE_BUTTON_MIDDLE;
     static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
     bool movingPiece = false;
+	bool promoting = false;
     
     do{
         // Clear the screen
@@ -310,6 +311,16 @@ int main( void )
         }
         else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
         
+		int cKeyState = glfwGetKey(window, GLFW_KEY_C);
+		if (cKeyState == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece) {
+			promoting = true;
+			//call function to read file and return which piece to move and where to move it
+			//            movingPiece, pieceToMove, whereToMove = getNextTurn(boardMatrix);
+			printf("KeyPressed\n");
+			oldState = GLFW_PRESS;
+		}
+		else if (cKeyState == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
+
         if (movingPiece) {
             // if there is a movement (movingPiece=True) to apply this function is called
             // when the movement ends it update the variable (movingPiece=False)
@@ -319,6 +330,12 @@ int main( void )
             // boardMatrix.move("a2", "a3"); double movement in case of O-O
             if (!movingPiece) boardMatrix.print();
         }
+
+		if (promoting) {
+			promoting = boardMatrix.promotion("b8", "WB");
+
+			if (!promoting) boardMatrix.print();
+		}
         
         // creates the menu bar
         {

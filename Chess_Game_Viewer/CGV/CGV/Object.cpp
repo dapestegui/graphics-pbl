@@ -9,6 +9,7 @@
 // Include GLEW
 #include <GL/glew.h>
 #include <vector>
+#include <algorithm>
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -174,11 +175,63 @@ public:
             printf("\n");
         }
     }
-    
+
+	std::pair<int, int> extractPos(char row, char column) 
+	{
+        int posX = 0, posZ = 0;
+        if (row >= '1' && row <= '8') {
+            posX = row - '1';
+        } else {
+            printf("Invalid startRow = %d\n", row);
+        }
+
+        if (column >= 'a' && column <= 'h') {
+            posZ = column - 'a';
+        } else {
+            printf("Invalid endRow = %c\n", column);
+        }
+        return std::make_pair(posX, posZ);
+	}
+
+	bool promotion(const char piecePos[3], const char* piecetype)
+	{
+        auto pos = extractPos(piecePos[1], piecePos[0]);
+
+        int posX = pos.first, posZ = pos.second;
+		float time = 200.0f;
+        float height = 20.0f;
+		float stepsForRotation = 30;
+
+		//implementation - verify if contains s piece on pieceStart!
+        if (Matrix[posX][posZ] == NULL) {
+            return false;
+        }
+
+		if (Matrix[posX][posZ]->pos.y >= height) {
+			return false;
+		}
+
+		float stepYSize = height / time;
+		Matrix[posX][posZ]->pos.y += stepYSize;
+
+		// Only Pawn can be promoted
+        if (Matrix[posX][posZ]->pieceType[1] == 'P') {
+			float initX = posX * 2;
+			float initZ = posZ * 2;
+			float step = Matrix[posX][posZ]->pos.y / stepYSize;
+			float arg = step / stepsForRotation * 2.0f * 3.1415;
+			float x = sin(arg) + initX;
+			float z = cos(arg) + initZ;
+            Matrix[posX][posZ]->pos.x = x;
+			Matrix[posX][posZ]->pos.z = z;
+		} else {
+			return false;
+		}
+		return true;
+	}
+
     bool move(const char pieceStart[3], const char pieceEnd[3])
     {
-        int initPosX = 0, initPosZ = 0, finalPosX = 0, finalPosZ = 0;
-        
         movingPiece = true;
         
         char startColumn = pieceStart[0];
@@ -186,117 +239,13 @@ public:
         char endColumn = pieceEnd[0];
         char endRow = pieceEnd[1];
         
-        switch (startColumn) {
-            case 'a':
-                initPosZ = 0;
-                break;
-            case 'b':
-                initPosZ = 1;
-                break;
-            case 'c':
-                initPosZ = 2;
-                break;
-            case 'd':
-                initPosZ = 3;
-                break;
-            case 'e':
-                initPosZ = 4;
-                break;
-            case 'f':
-                initPosZ = 5;
-                break;
-            case 'g':
-                initPosZ = 6;
-                break;
-            case 'h':
-                initPosZ = 7;
-                break;
-        }
-        
-        switch (startRow) {
-            case '1':
-                initPosX = 0;
-                break;
-            case '2':
-                initPosX = 1;
-                break;
-            case '3':
-                initPosX = 2;
-                break;
-            case '4':
-                initPosX = 3;
-                break;
-            case '5':
-                initPosX = 4;
-                break;
-            case '6':
-                initPosX = 5;
-                break;
-            case '7':
-                initPosX = 6;
-                break;
-            case '8':
-                initPosX = 7;
-                break;
-                
-        }
-        
-        switch (endColumn) {
-            case 'a':
-                finalPosZ = 0;
-                break;
-            case 'b':
-                finalPosZ = 1;
-                break;
-            case 'c':
-                finalPosZ = 2;
-                break;
-            case 'd':
-                finalPosZ = 3;
-                break;
-            case 'e':
-                finalPosZ = 4;
-                break;
-            case 'f':
-                finalPosZ = 5;
-                break;
-            case 'g':
-                finalPosZ = 6;
-                break;
-            case 'h':
-                finalPosZ = 7;
-                break;
-        }
-        
-        switch (endRow) {
-            case '1':
-                finalPosX = 0;
-                break;
-            case '2':
-                finalPosX = 1;
-                break;
-            case '3':
-                finalPosX = 2;
-                break;
-            case '4':
-                finalPosX = 3;
-                break;
-            case '5':
-                finalPosX = 4;
-                break;
-            case '6':
-                finalPosX = 5;
-                break;
-            case '7':
-                finalPosX = 6;
-                break;
-            case '8':
-                finalPosX = 7;
-                break;
-        }
-        
+		auto startPos = extractPos(startRow, startColumn);
+        auto endPos = extractPos(endRow, endColumn);
+
+		int initPosX = startPos.first, initPosZ = startPos.second, finalPosX = endPos.first, finalPosZ = endPos.second;
+		        
 //        float step = 0.15f;
-        float speed = 20.0f;
+        float speed = 200.0f;
         float stepX = float(finalPosX - initPosX)/speed;
         float stepZ = float(finalPosZ - initPosZ)/speed;
         
