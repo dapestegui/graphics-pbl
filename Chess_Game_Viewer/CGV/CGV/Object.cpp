@@ -141,6 +141,7 @@ public:
 	char pieceEnd[3];
 	bool castling = false;
 	bool promotion = false;
+	bool capture = false;
 	char rookStart[3];
 	char rookEnd[3];
 	char promotedTo;
@@ -235,13 +236,13 @@ public:
         return std::make_pair(posX, posZ);
 	}
 
-	bool promotion(const char piecePos[3], const char* piecetype)
+	bool pawnFly(char piecePos[3], char piecetype)
 	{
         auto pos = extractPos(piecePos[1], piecePos[0]);
 
         int posX = pos.first, posZ = pos.second;
-		float time = 200.0f;
-        float height = 20.0f;
+		float time = 20.0f;
+        float height = 10.0f;
 		float stepsForRotation = 30;
 
 		//implementation - verify if contains s piece on pieceStart!
@@ -305,12 +306,49 @@ public:
 		}
 	}
 
+	bool fallDown(char piecePos[3]) {
+		auto pos = extractPos(piecePos[1], piecePos[0]);
+
+		int posX = pos.first, posZ = pos.second;
+		std::cout << "fallDown: " << Matrix[posX][posZ]->pos.y << " " << Matrix[posX][posZ]->pos.x << " " << Matrix[posX][posZ]->pos.z << std::endl;
+		float time = 10.0f;
+		float height = 10.0f;
+		//float stepsForRotation = 30;
+
+		//implementation - verify if contains s piece on pieceStart!
+		if (Matrix[posX][posZ] == NULL) {
+			return false;
+		}
+
+		if (Matrix[posX][posZ]->pos.y <= 0.002) {
+			Matrix[posX][posZ]->pos.y = 0;
+			Matrix[posX][posZ]->pos.x = posX * 2;
+			Matrix[posX][posZ]->pos.z = posZ * 2;
+			std::cout << false << std::endl;
+			return false;
+		}
+
+		float stepYSize = height / time;
+		Matrix[posX][posZ]->pos.y -= stepYSize;
+		Matrix[posX][posZ]->pos.x = posX * 2;
+		Matrix[posX][posZ]->pos.z = posZ * 2;
+
+		return true;
+	}
+
 	bool promotion(char pieceStart[3], char pieceEnd[3], char promotedTo) {
 		bool moving = move(pieceStart, pieceEnd);
 		if (!moving) {
-			Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
-			Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
-			(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+			bool flying = pawnFly(pieceEnd, promotedTo);
+			if (!flying) {
+				if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
+					Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
+					Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
+					(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+				}
+				return fallDown(pieceEnd);
+			}
+			return flying;
 		}
 		return moving;
 	}
@@ -341,7 +379,7 @@ public:
         float initDist = sqrt(pow((finalPosX * 2.0f) - (initPosX * 2.0f), 2.0) +
                     pow((finalPosZ * 2.0f) - (initPosZ * 2.0f), 2.0));
         
-		float speed = 20.0f;
+		float speed = 5.0f;
 		float stepX = float(finalPosX - initPosX) / speed;
 		float stepZ = float(finalPosZ - initPosZ) / speed;
 
@@ -703,12 +741,12 @@ public:
 		//printSimulation();
 	}
 
-	std::string Know_init_pos(char destination[], char piece, char color, char info, char promotedTo) {
+	std::string Know_init_pos(char destination[], char piece, char color, char column, bool capture, char promotedTo) {
 
 		//Create an array of possible initial positions
-		StepsArray posibilitiesStepsArrayAUX = GetPosibilities(destination, piece, color, info == 'x', SimulationMatrix);
+		StepsArray posibilitiesStepsArrayAUX = GetPosibilities(destination, piece, color, capture, SimulationMatrix);
 		std::cout << posibilitiesStepsArrayAUX.index << std::endl;
-
+		std::cout << piece << std::endl;
 		//For every possible position check if the piece is in that position to verify (also need the infomation if its a kill movement(for pawns)
 		//(having an x in the step) and if the piece is B or W (first step or second step))
 		int counter = 0;
@@ -717,7 +755,7 @@ public:
 		bool directions[9] = { true, true, true, true, true, true, true, true };
 
 		for (int i = 0; i <= posibilitiesStepsArrayAUX.index; i++) {
-			//std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
+			std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
 			char x = posibilitiesStepsArrayAUX.steps[i].pieceStart[0];
 			char y = posibilitiesStepsArrayAUX.steps[i].pieceStart[1];
 			//Now only prints what we found in that possible initial position
@@ -732,11 +770,13 @@ public:
 						}
 						//std::cout << "directions: " << directions[0] << directions[1] << directions[2] << directions[3] << directions[4] << directions[5] << directions[6] << directions[7] << directions[8] << std::endl;
 					} else {
-						//std::cout << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
+						std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
+						std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[0] << " should be " << color << std::endl;
 						if ((SimulationMatrix[y - '1'][x - 'a']->pieceType[1] == piece) &&
 							(SimulationMatrix[y - '1'][x - 'a']->pieceType[0] == color)) {
-							if ((info != 'x') && (info != '\0')) {
-								if (x == info) {
+							std::cout << capture << " " << column << std::endl;
+							if (column != '\0' && column != 'x') {
+								if (x == column) {
 									counter++;
 									good = i;
 								}
@@ -778,24 +818,25 @@ public:
 			s.rookStart[0] = 'a';
 			s.rookStart[1] = '1';
 			s.rookEnd[0] = 'd';
-			s.rookEnd[1] = '1';
-			simulateMove("e1", "c1");
-			simulateMove("a1", "d1");
+s.rookEnd[1] = '1';
+simulateMove("e1", "c1");
+simulateMove("a1", "d1");
 
-		} else {
-			s.pieceStart[0] = 'e';
-			s.pieceStart[1] = '8';
-			s.pieceEnd[0] = 'c';
-			s.pieceEnd[1] = '8';
-			s.castling = true;
-			s.rookStart[0] = 'a';
-			s.rookStart[1] = '8';
-			s.rookEnd[0] = 'd';
-			s.rookEnd[1] = '8';
-			simulateMove("e8", "c8");
-			simulateMove("a8", "d8");
 		}
-		return s;
+ else {
+	 s.pieceStart[0] = 'e';
+	 s.pieceStart[1] = '8';
+	 s.pieceEnd[0] = 'c';
+	 s.pieceEnd[1] = '8';
+	 s.castling = true;
+	 s.rookStart[0] = 'a';
+	 s.rookStart[1] = '8';
+	 s.rookEnd[0] = 'd';
+	 s.rookEnd[1] = '8';
+	 simulateMove("e8", "c8");
+	 simulateMove("a8", "d8");
+ }
+ return s;
 	}
 
 	public:Step KCastling(char color) {
@@ -829,33 +870,16 @@ public:
 		return s;
 	}
 
-	public :Step GetStep(char array_s[], char color) {
+	public:Step GetStep(char array_s[], char color) {
 		Step return_step;
 		std::string aux1, aux2, row;
 		bool capture = false;
 		char aditional_info = '\0';
 		return_step.promotedTo = '\0';
+		char piece = 'P', column = '\0';
+		char* begin = array_s;
 
-		//STORE DESTINATION
-		if (strstr(array_s, "=") != NULL) { // When a pawn reach to the other side of the board
-			return_step.pieceEnd[0] = array_s[strlen(array_s) - 4];
-			return_step.pieceEnd[1] = array_s[strlen(array_s) - 3];
-			return_step.promotion = true;
-			return_step.promotedTo = array_s[strlen(array_s) - 1];
-		} else {
-			if (strstr(array_s, "+") != NULL) { // When a piece do check
-				return_step.pieceEnd[0] = array_s[strlen(array_s) - 3];
-				return_step.pieceEnd[1] = array_s[strlen(array_s) - 2];
-			} else {
-				if (strlen(array_s) > 3) {
-					aditional_info = return_step.pieceEnd[0] = array_s[strlen(array_s) - 3];
-				}
-				return_step.pieceEnd[0] = array_s[strlen(array_s) - 2];
-				return_step.pieceEnd[1] = array_s[strlen(array_s) - 1];
-			}
-		}
-
-		std::cout << array_s[0] << array_s[1] << std::endl;
+		// CASTLING
 		if (strstr(array_s, "-O-") != NULL) {
 			std::cout << "QCastling" << std::endl;
 			return QCastling(color);
@@ -865,14 +889,52 @@ public:
 			std::cout << "KCastling" << std::endl;
 			return KCastling(color);
 		}
+
+		//STORE DESTINATION
+		if (strstr(array_s, "=") != NULL) { // When a pawn reach to the other side of the board
+			return_step.pieceEnd[0] = array_s[strlen(array_s) - 4];
+			return_step.pieceEnd[1] = array_s[strlen(array_s) - 3];
+			return_step.promotion = true;
+			return_step.promotedTo = array_s[strlen(array_s) - 1];
+			array_s[strlen(array_s) - 4] = '\0';
+		}
+		else {
+			if (strstr(array_s, "+") != NULL) { // When a piece do check
+				return_step.pieceEnd[0] = array_s[strlen(array_s) - 3];
+				return_step.pieceEnd[1] = array_s[strlen(array_s) - 2];
+				array_s[strlen(array_s) - 3] = '\0';
+			}
+			else {
+				return_step.pieceEnd[0] = array_s[strlen(array_s) - 2];
+				return_step.pieceEnd[1] = array_s[strlen(array_s) - 1];
+				array_s[strlen(array_s) - 2] = '\0';
+			}
+		}
+
+		//STORE INITIAL POSITION
+		if (array_s[0] && array_s[0] < 'a') {
+			piece = array_s[0];
+			begin = array_s + 1;
+		} else {
+			piece = 'P';
+		}
+
+		if (strlen(begin) > 1) {
+			column = begin[0];
+			capture = begin[1] == 'x';
+		} else if (strlen(begin) > 0) {
+			column = begin[0];
+			capture = aditional_info == 'x';
+			return_step.capture = capture;
+		}
+
+		//std::cout << array_s[0] << array_s[1] << std::endl;
+
 		std::cout << "STORE OBJET [0]" << return_step.pieceEnd[0] << " [1]" << return_step.pieceEnd[1] << std::endl;
 		//END STORE DESTINATION
 
-		//STORE INITIAL POSITION
-
-		char piece = (array_s[0] < 'a') ? array_s[0] : 'P';
-
-		std::string init_pos = Know_init_pos(return_step.pieceEnd, piece, color, aditional_info, return_step.promotedTo);
+		std::cout << piece << std::endl;
+		std::string init_pos = Know_init_pos(return_step.pieceEnd, piece, color, column, capture, return_step.promotedTo);
 		/*if ((strstr(array_s, "x") == NULL) && (strstr(array_s, "+") == NULL) && (strstr(array_s, "=") == NULL) && (strlen(array_s) == 4)) {
 			// If we dont have x + or = symbol and the lenght is 4 means that we have a turn with "Nda3" form (the Knight that is in d colum goes to a3).
 			std::cout << " Search in row "; // TODO: different kind of finding for this special situation?
@@ -928,7 +990,9 @@ public:
 				}
 
 				c = ifs.get(); // space after dot
-				c = ifs.get(); // first sign of step
+				if (c == ' ') {
+					c = ifs.get(); // first sign of step
+				}
 				std::cout << c << std::endl;
 				// Read chars refering to the step
 				char step_array[2][6] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
