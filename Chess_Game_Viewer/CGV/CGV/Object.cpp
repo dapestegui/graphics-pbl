@@ -231,7 +231,9 @@ public:
 	}
 
 	bool castling(const char kingStart[3], const char kingEnd[3], const char rookStart[3], const char rookEnd[3]) {
-		return move(kingStart, kingEnd) || move(rookStart, rookEnd);
+		bool king = move(kingStart, kingEnd);
+		bool rook = move(rookStart, rookEnd);
+		return king || rook;
 	}
 	const char* pathToObj(char promotedTo) {
 		switch (promotedTo) {
