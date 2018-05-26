@@ -16,6 +16,7 @@
 // Include GLFW
 #include <GLFW/glfw3.h>
 GLFWwindow* window;
+int width = 960, height = 720;
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -97,6 +98,39 @@ void drawOBJ(Object &obj, ProjMatrix &PM)
     
 }
 
+void setInitialPos(Object *WPieces, Object *BPieces)
+{
+    // Set positions for all Pawns
+    // X - move forward - rows / Y - move up / Z - move to the side - columns
+    for (int i = 0; i < 8; i++) {
+        WPieces[i].setPos(2.0f, 0.0f, 2.0f*i);
+    }
+    // Set inital positions for all pieces
+    WPieces[8].setPos(0.0f, 0.0f, 0.0f);
+    WPieces[9].setPos(0.0f, 0.0f, 14.0f);
+    WPieces[10].setPos(0.0f, 0.0f, 2.0f);
+    WPieces[11].setPos(0.0f, 0.0f, 12.0f);
+    WPieces[12].setPos(0.0f, 0.0f, 4.0f);
+    WPieces[13].setPos(0.0f, 0.0f, 10.0f);
+    WPieces[14].setPos(0.0f, 0.0f, 6.0f);
+    WPieces[15].setPos(0.0f, 0.0f, 8.0f);
+    
+    // Set positions for all Pawns
+    for (int i = 0; i < 8; i++) {
+        BPieces[i].setPos(12.0f, 0.0f, 2.0f*i);
+    }
+    // Set positions for black pieces
+    BPieces[8].setPos(14.0f, 0.0f, 0.0f);
+    BPieces[9].setPos(14.0f, 0.0f, 14.0f);
+    BPieces[10].setPos(14.0f, 0.0f, 2.0f);
+    BPieces[11].setPos(14.0f, 0.0f, 12.0f);
+    BPieces[12].setPos(14.0f, 0.0f, 4.0f);
+    BPieces[13].setPos(14.0f, 0.0f, 10.0f);
+    BPieces[14].setPos(14.0f, 0.0f, 6.0f);
+    BPieces[15].setPos(14.0f, 0.0f, 8.0f);
+}
+
+
 int main( void )
 {
     // Initialise GLFW
@@ -114,7 +148,7 @@ int main( void )
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
     // Open a window and create its OpenGL context
-    window = glfwCreateWindow( 1024, 768, "Chess Game Viewer", NULL, NULL); //1024, 768
+    window = glfwCreateWindow( width, height, "Chess Game Viewer", NULL, NULL); //1024, 768
     if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window.\n" );
         getchar();
@@ -142,7 +176,7 @@ int main( void )
     
     // Set the mouse at the center of the screen
     glfwPollEvents();
-    glfwSetCursorPos(window, 1024/2, 768/2);
+    glfwSetCursorPos(window, width/2, height/2);
     
     // Dark blue background
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
@@ -186,62 +220,29 @@ int main( void )
     WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
     WPieces[1] = WPieces[2] = WPieces[3] = WPieces[4] = WPieces[5] = WPieces[6] = WPieces[7] = WPieces[0];
     
-    // Set positions for all Pawns
-    // X - move forward - rows / Y - move up / Z - move to the side - columns
-    for (int i = 0; i < 8; i++) {
-        WPieces[i].setPos(2.0f, 0.0f, 2.0f*i);
-    }
-    
-    // Set positions for other pieces
     WPieces[8].load("resources/CB_Rook.obj", "WR", Texture_White, TextureID);
     WPieces[9] = WPieces[8];
-    WPieces[8].setPos(0.0f, 0.0f, 0.0f);
-    WPieces[9].setPos(0.0f, 0.0f, 14.0f);
-    
     WPieces[10].load("resources/CB_Knight.obj", "WN", Texture_White, TextureID);
     WPieces[11] = WPieces[10];
-    WPieces[10].setPos(0.0f, 0.0f, 2.0f);
-    WPieces[11].setPos(0.0f, 0.0f, 12.0f);
-    
     WPieces[12].load("resources/CB_Bishop.obj", "WB", Texture_White, TextureID);
     WPieces[13] = WPieces[12];
-    WPieces[12].setPos(0.0f, 0.0f, 4.0f);
-    WPieces[13].setPos(0.0f, 0.0f, 10.0f);
-    
     WPieces[14].load("resources/CB_Queen.obj", "WQ", Texture_White, TextureID);
     WPieces[15].load("resources/CB_King.obj", "WK", Texture_White, TextureID);
-    WPieces[14].setPos(0.0f, 0.0f, 6.0f);
-    WPieces[15].setPos(0.0f, 0.0f, 8.0f);
     
     //Load the obj file and copy the data for all Pawns
     BPieces[0].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
     BPieces[1] = BPieces[2] = BPieces[3] = BPieces[4] = BPieces[5] = BPieces[6] = BPieces[7] = BPieces[0];
     
-    // Set positions for all Pawns
-    for (int i = 0; i < 8; i++) {
-        BPieces[i].setPos(12.0f, 0.0f, 2.0f*i);
-    }
-    
-    // Set positions for other pieces
     BPieces[8].load("resources/CB_Rook.obj", "BR", Texture_Black, TextureID);
     BPieces[9] = BPieces[8];
-    BPieces[8].setPos(14.0f, 0.0f, 0.0f);
-    BPieces[9].setPos(14.0f, 0.0f, 14.0f);
-    
     BPieces[10].load("resources/CB_KnightB.obj", "BN", Texture_Black, TextureID);
     BPieces[11] = BPieces[10];
-    BPieces[10].setPos(14.0f, 0.0f, 2.0f);
-    BPieces[11].setPos(14.0f, 0.0f, 12.0f);
-    
     BPieces[12].load("resources/CB_Bishop.obj", "BB", Texture_Black, TextureID);
     BPieces[13] = BPieces[12];
-    BPieces[12].setPos(14.0f, 0.0f, 4.0f);
-    BPieces[13].setPos(14.0f, 0.0f, 10.0f);
-    
     BPieces[14].load("resources/CB_Queen.obj", "BQ", Texture_Black, TextureID);
     BPieces[15].load("resources/CB_King.obj", "BK", Texture_Black, TextureID);
-    BPieces[14].setPos(14.0f, 0.0f, 6.0f);
-    BPieces[15].setPos(14.0f, 0.0f, 8.0f);
+    
+    setInitialPos(WPieces, BPieces);
     
     BoardMatrix boardMatrix;
     boardMatrix.init(WPieces, BPieces);
@@ -407,7 +408,7 @@ int main( void )
             window_flags |= ImGuiWindowFlags_NoMove;
             window_flags |= ImGuiWindowFlags_NoNav;
             ImGui::Begin("Buttons", 0, window_flags);
-            ImGui::SetWindowPos(ImVec2 (1024/2 - 264/2, 768 - 680/15));
+            ImGui::SetWindowPos(ImVec2 (width/2 - 264/2, height - 45));
             ImGui::SetWindowSize(ImVec2 (264, 35));
             if (ImGui::Button("   <<  "))
             {
@@ -444,6 +445,7 @@ int main( void )
         // create a open file menu
         if (menuOpen) {
             ImGuiWindowFlags window_flags = 0;
+            ImGui::SetNextWindowBgAlpha(1.0);
             window_flags |= ImGuiWindowFlags_NoResize;
             window_flags |=ImGuiWindowFlags_NoTitleBar;
             ImGui::Begin("Open File", NULL, window_flags);
@@ -453,38 +455,30 @@ int main( void )
             
             ImGui::BeginChild("child", ImVec2(0, 180), true);
             char file[1024];
+            struct dirent *ent;
             
             // read folder and get all files .pgn inside that
-            {
-                // read files in the directory PGN
-                DIR *dir;
-                struct dirent *ent;
-                if ((dir = opendir ("pgn")) != NULL) {
-                    // print all the files .pgn inside the menu item
-                    while ((ent = readdir (dir)) != NULL) {
-
-                        // extract extension of file
-                        char * ext;
-                        ext = strtok(ent->d_name, ".");
-                        ext = strtok(NULL, ".");
-                        // if contains extension .pgn create item in the list
-                        if (ext != NULL && strcmp(ext, "pgn") == 0) {
-                            if(ImGui::MenuItem(ent->d_name))
-                            {
-                                printf("%s\n", ent->d_name);
-                                memcpy ( file, ent->d_name, strlen(ent->d_name)+1 );
-                            }
-                        }
-                    }
-                    closedir (dir);
-                } else {
-                    // could not open directory
-                    perror ("Could not open directory pgn");
-                    return EXIT_FAILURE;
+            // read files in the directory PGN
+            DIR *dir;
+            if ((dir = opendir ("pgn")) != NULL) {
+                // print all the files .pgn inside the menu item
+                while ((ent = readdir (dir)) != NULL) {
+                    
+                    std::size_t is_pgn = std::string(ent->d_name).find(".pgn");
+                    
+                    if (is_pgn!=std::string::npos && ImGui::MenuItem(ent->d_name)) memcpy(file, ent->d_name, strlen(ent->d_name)+1);
                 }
+                closedir (dir);
+            } else {
+                // could not open directory
+                perror ("Could not open directory pgn");
+                return EXIT_FAILURE;
             }
             
             ImGui::EndChild();
+            
+            file[0] != '\0' ? ImGui::Text("Open: %s", file) : ImGui::Text("Open: ");
+            
             // when cancel is pressed, just close the window
             if (ImGui::Button("Cancel"))
             {
@@ -494,14 +488,15 @@ int main( void )
             // button open
             if (ImGui::Button("Open"))
             {
-                char filePath[] = "pgn/";
+                char filePath[5] = "pgn/";
                 strcat(filePath, file);
-                strcat(filePath, ".pgn");
+                //                strcat(filePath, ".pgn");
                 
                 // open file defined by pgn/ file
                 printf("%s\n", filePath);
                 // reset board to the initial positions
-                
+                setInitialPos(WPieces, BPieces);
+                boardMatrix.init(WPieces, BPieces);
                 // insert it on the top of the recent list
                 
                 // verify if list is greatter than 5, if yes delete values

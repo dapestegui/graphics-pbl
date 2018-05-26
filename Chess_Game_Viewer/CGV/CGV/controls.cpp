@@ -3,6 +3,8 @@
 // Include GLFW
 #include <GLFW/glfw3.h>
 extern GLFWwindow* window; // The "extern" keyword here is to access the variable "window" declared in main.cpp.
+extern int width, height;
+
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -76,7 +78,7 @@ glm::vec3 computeMatricesFromInputs(const int &mouseButton){
             // save the position to return it after the button is released
             glfwGetCursorPos(window, &oldXpos, &oldYpos);
             // Reset mouse position for initial frame
-            glfwSetCursorPos(window, 1024/2, 768/2);
+            glfwSetCursorPos(window, width/2, height/2);
             click_down = true;
             
             // Hide the mouse and enable unlimited mouvement
@@ -86,11 +88,11 @@ glm::vec3 computeMatricesFromInputs(const int &mouseButton){
         glfwGetCursorPos(window, &xpos, &ypos);
         
         // Reset mouse position for next frame
-        glfwSetCursorPos(window, 1024/2, 768/2);
+        glfwSetCursorPos(window, width/2, height/2);
         
         // Compute new orientation
-        horizontalAngle += mouseSpeed * float(1024/2 - xpos );
-        verticalAngle   += mouseSpeed * float( 768/2 - ypos );
+        horizontalAngle += mouseSpeed * float(width/2 - xpos );
+        verticalAngle   += mouseSpeed * float( height/2 - ypos );
         
     } else {
         // set mouse to normal again
