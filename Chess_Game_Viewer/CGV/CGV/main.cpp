@@ -11,7 +11,7 @@
 #endif
 
 // Include GLEW
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 // Include GLFW
 #include <GLFW/glfw3.h>
@@ -130,7 +130,6 @@ void setInitialPos(Object *WPieces, Object *BPieces)
     BPieces[15].setPos(14.0f, 0.0f, 8.0f);
 }
 
-
 int main( void )
 {
     // Initialise GLFW
@@ -144,8 +143,10 @@ int main( void )
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifndef _WIN32
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
     
     // Open a window and create its OpenGL context
     window = glfwCreateWindow( width, height, "Chess Game Viewer", NULL, NULL); //1024, 768
@@ -269,6 +270,8 @@ int main( void )
     static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
     bool movingPiece = false;
 	bool promoting = false;
+	
+	StepsArray ax = boardMatrix.Read_Steps("./pgn/grafl_jones_2018.pgn");
     
     do{
         // Clear the screen
@@ -311,7 +314,7 @@ int main( void )
         }
         else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
         
-		int cKeyState = glfwGetKey(window, GLFW_KEY_C);
+		/*int cKeyState = glfwGetKey(window, GLFW_KEY_C);
 		if (cKeyState == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece) {
 			promoting = true;
 			//call function to read file and return which piece to move and where to move it
@@ -319,23 +322,38 @@ int main( void )
 			printf("KeyPressed\n");
 			oldState = GLFW_PRESS;
 		}
-		else if (cKeyState == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
+		else if (cKeyState == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;*/
 
         if (movingPiece) {
+
             // if there is a movement (movingPiece=True) to apply this function is called
             // when the movement ends it update the variable (movingPiece=False)
-            //            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
-            movingPiece = boardMatrix.move("b2", "b8");
-            // to implement:
-            // boardMatrix.move("a2", "a3"); double movement in case of O-O
-            if (!movingPiece) boardMatrix.print();
+			
+//            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
+			if (ax.active < ax.index) {
+				Step activeStep = ax.steps[ax.active];
+				std::cout << "active = " << ax.active << std::endl;
+				//std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+				if (activeStep.castling) {
+					//std::cout << "castling " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.castling(activeStep.pieceStart, activeStep.pieceEnd, activeStep.rookStart, activeStep.rookEnd);
+				}
+				else if (activeStep.promotion) {
+					//std::cout << "promotion " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.promotion(activeStep.pieceStart, activeStep.pieceEnd, activeStep.promotedTo);
+				}
+				else {
+					//std::cout << "move " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+					movingPiece = boardMatrix.move(activeStep.pieceStart, activeStep.pieceEnd);
+				}
+				//std::cout << "movingPiece = " << movingPiece << std::endl;
+				//movingPiece = boardMatrix.move("b2", "c6");
+				if (!movingPiece) {
+					//boardMatrix.print();
+					ax.active++;
+				}
+			}
         }
-
-		if (promoting) {
-			promoting = boardMatrix.promotion("b8", "WB");
-
-			if (!promoting) boardMatrix.print();
-		}
         
         // creates the menu bar
         {
