@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <filesystem>
+//#include <filesystem>
 #include <fstream>
 #include <iostream>
 // Include GLEW
@@ -652,17 +652,21 @@ public:
 		return posibilitiesStepsArrayAUX;
 	}
 
-	void Ommit_headers(std::ifstream& file) {
-
+    void Ommit_headers(std::ifstream& file, std::string &header) {
+        header.clear();
 		std::string line;
-		while (getline(file, line)) {
-			std::cout << line;
-			if (line.compare("") == 0) {
-				break;
-			}
-
-
-		}
+//        while (getline(file, line)) {
+//            std::cout << line;
+//            if (line.compare("") == 0) {
+//                break;
+//            }
+//        }
+        for (int i =0; i < 13; i++) {
+            getline(file, line);
+            
+            header += line + '\n';
+            std::cout << line;
+            }
 	}
 
 	void simulatePromotion(char endPos[], char piece) {
@@ -753,13 +757,13 @@ public:
 
 		if (counter < 1) {
 			std::cout << "UPS... None of posibilities is good :(" << std::endl;
-			throw "UPS... None of posibilities is good :(";
+//            throw "UPS... None of posibilities is good :(";
 		} else if (counter == 1) {
 			std::cout << "YAY! Only one option! " << posibilitiesStepsArrayAUX.steps[good].pieceStart[0] << posibilitiesStepsArrayAUX.steps[good].pieceStart[1] << std::endl;
 			simulateMove(posibilitiesStepsArrayAUX.steps[good].pieceStart, destination);
 		} else {
 			std::cout << "AHR... More than one posibility is correct :/" << std::endl;
-			throw "AHR... More than one posibility is correct :/";
+//            throw "AHR... More than one posibility is correct :/";
 		}
 		if (promotedTo) {
 			simulatePromotion(destination, promotedTo);
@@ -890,7 +894,7 @@ public:
 		return return_step;
 	}
 
-	public :StepsArray Read_Steps(std::string fileStr){
+    public :StepsArray Read_Steps(std::string fileStr, std::string &header){
 		StepsArray steps_array_return;
 		steps_array_return.active = 0;
 		int steps_index = 0;
@@ -900,77 +904,77 @@ public:
 
 		if (ifs.is_open()) {
 			// Each PGN file has a header useless for us, we ommit them
-			Ommit_headers(ifs);
+			Ommit_headers(ifs, header);
 
-			int turn = 0;
-			char c='x';
+            int turn = 0;
+            char c='x';
 
-			std::cout << '\n';
-		
-			while (!ifs.eof()) { // In every iteration we extract info from 1. FIRST TURN SECOND TURN | iteration 2. FIRST TURN SECOND TURN
-			
-				while ((c != '.') && !ifs.eof()) { //ommit number of turn, dot and space of every turn
-					std::cout << c;
-					c = ifs.get();
-				}
+            std::cout << '\n';
 
-				if (ifs.eof()) {
-					std::cout << "DONE!" << std::endl;
-					ifs.close();
-					std::cout << steps_array_return.index << std::endl;
-					for (int i = 0; i < 8; i++) {
-						for (int j = 0; j < 8; j++) {
-							delete(SimulationMatrix[i][j]);
-							SimulationMatrix[i][j] = NULL;
-						}
-					}
-					return steps_array_return;
-				}
+            while (!ifs.eof()) { // In every iteration we extract info from 1. FIRST TURN SECOND TURN | iteration 2. FIRST TURN SECOND TURN
 
-				c = ifs.get(); // space after dot
-				c = ifs.get(); // first sign of step
-				std::cout << c << std::endl;
-				// Read chars refering to the step
-				char step_array[2][6] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+                while ((c != '.') && !ifs.eof()) { //ommit number of turn, dot and space of every turn
+                    std::cout << c;
+                    c = ifs.get();
+                }
 
-				// two turns
-				for (int k = 0; k < 2; k++) {
-					//TURN
-					for (int i = 0; c != ' ' && c != '\n'; i++) {
-						step_array[k][i] = c;
-						c = ifs.get();
-					}
-					turn++;
-					//PRINT STEPS
-					//std::cout << '\n';
-					//std::string aux, aux2, aux3, aux4, aux5;
-					//aux = step_array[0];
-					//aux2 = step_array[1];aux3 = step_array[2];aux4 = step_array[3];aux5 = step_array[4];
-					std::cout << " El paso " << turn << " es: " << step_array[k] << " | " << "Sentence entered " << strlen(step_array[k]) << " long\n"; // aux + aux2 + aux3 + aux4 + aux5 + "|";
+                if (ifs.eof()) {
+                    std::cout << "DONE!" << std::endl;
+                    ifs.close();
+                    std::cout << steps_array_return.index << std::endl;
+                    for (int i = 0; i < 8; i++) {
+                        for (int j = 0; j < 8; j++) {
+                            delete(SimulationMatrix[i][j]);
+                            SimulationMatrix[i][j] = NULL;
+                        }
+                    }
+                    return steps_array_return;
+                }
 
+                c = ifs.get(); // space after dot
+                c = ifs.get(); // first sign of step
+                std::cout << c << std::endl;
+                // Read chars refering to the step
+                char step_array[2][6] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
-					//printf("Sentence entered %u long.\n", (unsigned)strlen(step_array));
+                // two turns
+                for (int k = 0; k < 2; k++) {
+                    //TURN
+                    for (int i = 0; c != ' ' && c != '\n' && c != '\r'; i++) {
+                        step_array[k][i] = c;
+                        c = ifs.get();
+                    }
+                    turn++;
+                    //PRINT STEPS
+                    //std::cout << '\n';
+                    //std::string aux, aux2, aux3, aux4, aux5;
+                    //aux = step_array[0];
+                    //aux2 = step_array[1];aux3 = step_array[2];aux4 = step_array[3];aux5 = step_array[4];
+                    std::cout << " El paso " << turn << " es: " << step_array[k] << " | " << "Sentence entered " << strlen(step_array[k]) << " long\n"; // aux + aux2 + aux3 + aux4 + aux5 + "|";
 
 
-					// Return a step object with initial position and destination position
-					char color = turn % 2 == 1 ? 'W' : 'B';
+                    //printf("Sentence entered %u long.\n", (unsigned)strlen(step_array));
+
+
+                    // Return a step object with initial position and destination position
+                    char color = turn % 2 == 1 ? 'W' : 'B';
                     Step step = GetStep(step_array[k], color);
 
-					steps_array_return.steps[steps_index] = step;
-					steps_index++;
-					steps_array_return.index = steps_index;
+                    steps_array_return.steps[steps_index] = step;
+                    steps_index++;
+                    steps_array_return.index = steps_index;
 
-					//Avoid end of line and strange cases
-					if (c == '\n') {
-						c = ifs.get();
-						while (c == '\n' || c == ' ') {
-							c = ifs.get();
-						}
-					} else {
-						c = ifs.get();
-					}
-				}
-			}
+                    //Avoid end of line and strange cases
+                    if (c == '\n' || c == '\r') {
+                        c = ifs.get();
+                        while (c == '\n' || c == ' ' || c == '\r') {
+                            c = ifs.get();
+                        }
+                    } else {
+                        c = ifs.get();
+                    }
+                }
+            }
 		} else {
 			// show message:
 			std::cout << "Error opening file";
