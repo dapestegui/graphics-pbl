@@ -988,6 +988,9 @@ public:
 
     public :StepsArray Read_Steps(std::string fileStr, std::string &header){
 		StepsArray steps_array_return;
+        nBPiecesDead = 0;
+        nWPiecesDead = 0;
+        
 		//steps_array_return.active = 0;
 		int steps_index = 0;
 
