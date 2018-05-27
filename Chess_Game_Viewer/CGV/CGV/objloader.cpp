@@ -77,6 +77,10 @@ bool loadOBJ(
 
 	}
 
+	out_vertices.clear();
+	out_uvs.clear();
+	out_normals.clear();
+
 	// For each vertex of each triangle
 	for( unsigned int i=0; i<vertexIndices.size(); i++ ){
 

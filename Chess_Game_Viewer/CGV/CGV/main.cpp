@@ -217,7 +217,8 @@ int main( void )
     
     //Load the obj file and copy the data for all Pawns
     WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
-    WPieces[1] = WPieces[2] = WPieces[3] = WPieces[4] = WPieces[5] = WPieces[6] = WPieces[7] = WPieces[0];
+	for (int i = 0; i < 8; ++i)
+		WPieces[i].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
     
     WPieces[8].load("resources/CB_Rook.obj", "WR", Texture_White, TextureID);
     WPieces[9] = WPieces[8];
@@ -229,8 +230,8 @@ int main( void )
     WPieces[15].load("resources/CB_King.obj", "WK", Texture_White, TextureID);
     
     //Load the obj file and copy the data for all Pawns
-    BPieces[0].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
-    BPieces[1] = BPieces[2] = BPieces[3] = BPieces[4] = BPieces[5] = BPieces[6] = BPieces[7] = BPieces[0];
+	for (int i = 0; i < 8; ++i)
+		BPieces[i].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
     
     BPieces[8].load("resources/CB_Rook.obj", "BR", Texture_Black, TextureID);
     BPieces[9] = BPieces[8];

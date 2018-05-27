@@ -355,7 +355,8 @@ public:
 					if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
 						Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
 						Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
-						(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+						piece->del();
+						piece->load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
 					}
 					return fallDown(pieceEnd);
 				}
@@ -364,10 +365,11 @@ public:
 			return moving;
 		} else {
 			std::cout << "promotion back: " << promotedTo << " " << pieceStart[0] << pieceStart[1] << std::endl;
-			if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
-				Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
-				Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
-				(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+			if (Matrix[pieceStart[1] - '1'][pieceStart[0] - 'a']->pieceType[1] != promotedTo) {
+				Matrix[pieceStart[1] - '1'][pieceStart[0] - 'a']->pieceType[1] = promotedTo;
+				Object* piece = Matrix[pieceStart[1] - '1'][pieceStart[0] - 'a'];
+				piece->del();
+				piece->load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
 			}
 			return move(pieceStart, pieceEnd, false, capture);
 		}
@@ -402,6 +404,12 @@ public:
 
 		Captured[capturedIndex - 1] = NULL;
 		capturedIndex--;
+
+		if (Matrix[posX][posZ]->pieceType[0] == 'B') {
+			nBPiecesDead--;
+		} else {
+			nWPiecesDead--;
+		}
 	}
     
     bool move(const char pieceStart[2], const char pieceEnd[2], bool moveForward, bool capture)
