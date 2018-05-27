@@ -272,7 +272,7 @@ int main( void )
 	bool promoting = false;
 	
     std::string header = "Load PGN";
-    StepsArray ax = boardMatrix.Read_Steps("./pgn/grafl_jones_2018.pgn", header);
+    StepsArray ax;
     
     do{
         // Clear the screen
@@ -570,6 +570,10 @@ int main( void )
                 
                 // open file defined by pgn/ file
                 printf("%s\n", filePath);
+                ax.index = 0;
+                ax.active = 0;
+                back, forward = 0;
+                ax = boardMatrix.Read_Steps(filePath, header);
                 // reset board to the initial positions
                 setInitialPos(WPieces, BPieces);
                 boardMatrix.init(WPieces, BPieces);

@@ -1032,6 +1032,10 @@ public:
                 // two turns
                 for (int k = 0; k < 2; k++) {
                     //TURN
+                    if (c == '1' || c == '0') {
+                        break;
+                    }
+                    
                     for (int i = 0; c != ' ' && c != '\n' && c != '\r'; i++) {
                         step_array[k][i] = c;
                         c = ifs.get();
