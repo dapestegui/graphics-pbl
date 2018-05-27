@@ -1027,7 +1027,7 @@ public:
                 }
 
                 c = ifs.get(); // space after dot
-                c = ifs.get(); // first sign of step
+                if (c == ' ') c = ifs.get(); // first sign of step
                 std::cout << c << std::endl;
                 // Read chars refering to the step
                 char step_array[2][6] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
@@ -1039,7 +1039,7 @@ public:
                         break;
                     }
                     
-                    for (int i = 0; c != ' ' && c != '\n' && c != '\r'; i++) {
+                    for (int i = 0; c != ' ' && c != '\n' && c != '\r' && c != '#'; i++) {
                         step_array[k][i] = c;
                         c = ifs.get();
                     }
@@ -1064,7 +1064,7 @@ public:
                     steps_array_return.index = steps_index;
 
                     //Avoid end of line and strange cases
-                    if (c == '\n' || c == '\r') {
+                    if (c == '\n' || c == '\r' ||  c == '#') {
                         c = ifs.get();
                         while (c == '\n' || c == ' ' || c == '\r') {
                             c = ifs.get();
