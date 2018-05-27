@@ -266,7 +266,8 @@ int main( void )
     static bool mouseControl = false;
     static int mouseButton = GLFW_MOUSE_BUTTON_MIDDLE;
     static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
-    bool movingPiece = false;
+	bool movingPiece = false, movingBack = false, movingForward = false;
+	int back = 0, forward = 0;
 	bool promoting = false;
 	
     std::string header = "Load PGN";
@@ -303,53 +304,80 @@ int main( void )
         
         // when Space is pressed the software loads the next turn and set the flag movingPiece=True indicating a new movement
         // oldState enables the function only when the key is pressed, not while it is pressed
-        int nextStep = glfwGetKey( window, GLFW_KEY_SPACE );
+        int nextStep = glfwGetKey( window, GLFW_KEY_RIGHT );
         if (nextStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece){
             movingPiece = true;
+			movingForward = true;
+			forward++;
             //call function to read file and return which piece to move and where to move it
             //            movingPiece, pieceToMove, whereToMove = getNextTurn(boardMatrix);
-            printf("KeyPressed\n");
+            printf("Key Right Pressed\n");
             oldState = GLFW_PRESS;
         }
         else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
-        
-		/*int cKeyState = glfwGetKey(window, GLFW_KEY_C);
-		if (cKeyState == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece) {
-			promoting = true;
+
+		int previousStep = glfwGetKey(window, GLFW_KEY_LEFT);
+		if (previousStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece) {
+			movingPiece = true;
+			movingBack = true;
+			back++;
 			//call function to read file and return which piece to move and where to move it
 			//            movingPiece, pieceToMove, whereToMove = getNextTurn(boardMatrix);
-			printf("KeyPressed\n");
+			printf("Key Left Pressed\n");
 			oldState = GLFW_PRESS;
 		}
-		else if (cKeyState == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;*/
+		else if (previousStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
 
         if (movingPiece) {
-
-            // if there is a movement (movingPiece=True) to apply this function is called
-            // when the movement ends it update the variable (movingPiece=False)
-			
-//            movingPiece = boardMatrix.move(pieceToMove, whereToMove);
-			if (ax.active < ax.index) {
+			if (movingBack) {
+				std::cout << "movingBack " << back << std::endl;
+				ax.active = max(ax.active - min(back - 1, 1), 0);
+			}
+			if (movingForward) {
+				std::cout << "movingForward " << forward << std::endl;
+				ax.active = min(ax.active + min(forward - 1, 1), ax.index);
+			}
+			std::cout << "active = " << ax.active << std::endl;
+			if ((ax.active < ax.index) && (ax.active >= 0)) {
 				Step activeStep = ax.steps[ax.active];
-				std::cout << "active = " << ax.active << std::endl;
-				//std::cout << "movingPiece" << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
+				std::cout << activeStep.pieceStart[0] << activeStep.pieceStart[1] << " to " << activeStep.pieceEnd[0] << activeStep.pieceEnd[1] << std::endl;
+				char * pieceStart, *pieceEnd, *rookStart, *rookEnd;
+				char promotedTo;
+				if (movingBack) {
+					pieceStart = activeStep.pieceEnd;
+					pieceEnd = activeStep.pieceStart;
+					if (activeStep.castling) {
+						rookStart = activeStep.rookEnd;
+						rookEnd = activeStep.rookStart;
+					}
+					if (activeStep.promotion) {
+						promotedTo = 'P';
+					}
+					forward = 0;
+					movingBack = false;
+				}
+				if (movingForward) {
+					pieceStart = activeStep.pieceStart;
+					pieceEnd = activeStep.pieceEnd;
+					if (activeStep.castling) {
+						rookStart = activeStep.rookStart;
+						rookEnd = activeStep.rookEnd;
+					}
+					if (activeStep.promotion) {
+						promotedTo = activeStep.promotedTo;
+					}
+					back = 0;
+					movingForward = false;
+				}
 				if (activeStep.castling) {
-					//std::cout << "castling " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
-					movingPiece = boardMatrix.castling(activeStep.pieceStart, activeStep.pieceEnd, activeStep.rookStart, activeStep.rookEnd);
+					movingPiece = boardMatrix.castling(pieceStart, pieceEnd, rookStart, rookEnd);
 				}
 				else if (activeStep.promotion) {
-					//std::cout << "promotion " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
-					movingPiece = boardMatrix.promotion(activeStep.pieceStart, activeStep.pieceEnd, activeStep.promotedTo);
+					movingPiece = boardMatrix.promotion(pieceStart, pieceEnd, promotedTo, forward > 0, activeStep.capture);
 				}
 				else {
-					//std::cout << "move " << activeStep.pieceStart[0] << activeStep.pieceStart[1] << std::endl;
-					movingPiece = boardMatrix.move(activeStep.pieceStart, activeStep.pieceEnd);
-				}
-				//std::cout << "movingPiece = " << movingPiece << std::endl;
-				//movingPiece = boardMatrix.move("b2", "c6");
-				if (!movingPiece) {
-					//boardMatrix.print();
-					ax.active++;
+					std::cout << "move piece" << std::endl;
+					movingPiece = boardMatrix.move(pieceStart, pieceEnd, forward > 0, activeStep.capture);
 				}
 			}
         }
@@ -451,11 +479,15 @@ int main( void )
             ImGui::SameLine();
             if (ImGui::Button("   <   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
             {
-                
+				movingBack = true;
+				back++;
+				movingPiece = true;
             }
             ImGui::SameLine();
             if (ImGui::Button("   >   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
             {
+				movingForward = true;
+				forward++;
                 movingPiece = true;
             }
             ImGui::SameLine();

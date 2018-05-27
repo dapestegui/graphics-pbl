@@ -58,6 +58,7 @@ public:
         
         // implement if obj was loaded well
         bool wParts = loadOBJ(path, v, uvs, n);
+		std::cout << "load: " << wParts << std::endl;
         glGenBuffers(1, &vb);
         glBindBuffer(GL_ARRAY_BUFFER, vb);
         glBufferData(GL_ARRAY_BUFFER, v.size() * sizeof(glm::vec3), &v[0], GL_STATIC_DRAW);
@@ -153,7 +154,7 @@ public:
 class StepsArray {
 public:
 	int index;
-	int active;
+	int active = 0;
 	Step steps[1000];
 //public:
 	//void init_StepsArray(int index);
@@ -165,6 +166,8 @@ class BoardMatrix
 private:
     Object *Matrix[8][8];
 	Object *SimulationMatrix[8][8];
+	Object *Captured[32];
+	int capturedIndex = 0;
     bool movingPiece = false;
     int nBPiecesDead = 0, nWPiecesDead = 0;
 public:
@@ -253,22 +256,23 @@ public:
             return false;
         }
 
+		//std::cout << "pawnFly " << Matrix[posX][posZ]->pos.y << std::endl;
 		if (Matrix[posX][posZ]->pos.y >= height) {
 			return false;
 		}
 
-		float stepYSize = height / time;
-		Matrix[posX][posZ]->pos.y += stepYSize;
-
 		// Only Pawn can be promoted
         if (Matrix[posX][posZ]->pieceType[1] == 'P') {
+			float stepYSize = height / time;
+			Matrix[posX][posZ]->pos.y += stepYSize;
+
 			float initX = posX * 2;
 			float initZ = posZ * 2;
 			float step = Matrix[posX][posZ]->pos.y / stepYSize;
 			float arg = step / stepsForRotation * 2.0f * 3.1415;
 			float x = sin(arg) + initX;
 			float z = cos(arg) + initZ;
-            Matrix[posX][posZ]->pos.x = x;
+			Matrix[posX][posZ]->pos.x = x;
 			Matrix[posX][posZ]->pos.z = z;
 		} else {
 			return false;
@@ -290,8 +294,8 @@ public:
 	}
 
 	bool castling(const char kingStart[3], const char kingEnd[3], const char rookStart[3], const char rookEnd[3]) {
-		bool king = move(kingStart, kingEnd);
-		bool rook = move(rookStart, rookEnd);
+		bool king = move(kingStart, kingEnd, true, false);
+		bool rook = move(rookStart, rookEnd, true, false);
 		return king || rook;
 	}
 	const char* pathToObj(char promotedTo) {
@@ -332,46 +336,82 @@ public:
 		}
 
 		float stepYSize = height / time;
+		std::cout << "stepYSize " << stepYSize << std::endl;
 		Matrix[posX][posZ]->pos.y -= stepYSize;
 		Matrix[posX][posZ]->pos.x = posX * 2;
 		Matrix[posX][posZ]->pos.z = posZ * 2;
+		std::cout << "after changes: " << Matrix[posX][posZ]->pos.y << " " << Matrix[posX][posZ]->pos.x << " " << Matrix[posX][posZ]->pos.z << std::endl;
+
 
 		return true;
 	}
 
-	bool promotion(char pieceStart[3], char pieceEnd[3], char promotedTo) {
-		bool moving = move(pieceStart, pieceEnd);
-		if (!moving) {
-			bool flying = pawnFly(pieceEnd, promotedTo);
-			if (!flying) {
-				if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
-					Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
-					Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
-					(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+	bool promotion(char pieceStart[3], char pieceEnd[3], char promotedTo, bool movingForward, bool capture) {
+		if (movingForward) {
+			bool moving = move(pieceStart, pieceEnd, true, capture);
+			if (!moving) {
+				bool flying = pawnFly(pieceEnd, promotedTo);
+				if (!flying) {
+					if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
+						Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
+						Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
+						(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+					}
+					return fallDown(pieceEnd);
 				}
-				return fallDown(pieceEnd);
+				return flying;
 			}
-			return flying;
+			return moving;
+		} else {
+			std::cout << "promotion back: " << promotedTo << " " << pieceStart[0] << pieceStart[1] << std::endl;
+			if (Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] != promotedTo) {
+				Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
+				Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
+				(*Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']).load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+			}
+			return move(pieceStart, pieceEnd, false, capture);
 		}
-		return moving;
+	}
+
+	void capturePiece(int posX, int posZ) {
+		std::cout << "Capture " << posX << " " << posZ << " " << Matrix[posX][posZ]->pieceType[0] << Matrix[posX][posZ]->pieceType[1] << std::endl;
+		// if piece is black piece goes to the right of the board, if is white goes to the left
+		if (Matrix[posX][posZ]->pieceType[0] == 'B') {
+			Matrix[posX][posZ]->pos.x = -2.0f + nBPiecesDead; // -2.0f 18.0f
+			Matrix[posX][posZ]->pos.z = 18.0f;
+			nBPiecesDead++;
+		}
+		else
+		{
+			Matrix[posX][posZ]->pos.x = 16.0f - nWPiecesDead;
+			Matrix[posX][posZ]->pos.z = -4.0f;
+			nWPiecesDead++;
+		}
+		Captured[capturedIndex] = Matrix[posX][posZ];
+		Matrix[posX][posZ] = NULL;
+		std::cout << "capture: " << (Captured[capturedIndex] ? Captured[capturedIndex]->pieceType[0] : 'l') << (Captured[capturedIndex] ? Captured[capturedIndex]->pieceType[1] : 'l') << std::endl;
+		capturedIndex++;
+	}
+
+	void uncapturePiece(int posX, int posZ) {
+		//std::cout << "Uncapture " << posX << " " << posZ << " " << Matrix[posX][posZ]->pieceType[0] << Matrix[posX][posZ]->pieceType[1] << std::endl;
+		Captured[capturedIndex - 1]->pos.x = posX * 2;
+		Captured[capturedIndex - 1]->pos.z = posZ * 2;
+		Matrix[posX][posZ] = Captured[capturedIndex - 1];
+		std::cout << "uncapture: " << (Captured[capturedIndex-1] ? Captured[capturedIndex-1]->pieceType[0] : 'l') << (Captured[capturedIndex-1] ? Captured[capturedIndex-1]->pieceType[1] : 'l') << std::endl;
+
+		Captured[capturedIndex - 1] = NULL;
+		capturedIndex--;
 	}
     
-    bool move(const char pieceStart[2], const char pieceEnd[2])
+    bool move(const char pieceStart[2], const char pieceEnd[2], bool moveForward, bool capture)
     {
-		//std::cout << pieceStart[0] << pieceStart[1] << " to " << pieceEnd[0] << pieceEnd[1] << std::endl;
-        //int initPosX = 0, initPosZ = 0, finalPosX = 0, finalPosZ = 0;
 		bool movingPiece = true;
 		auto startPos = extractPos(pieceStart[1], pieceStart[0]);
         auto endPos = extractPos(pieceEnd[1], pieceEnd[0]);
 
 		int initPosX = startPos.first, initPosZ = startPos.second, finalPosX = endPos.first, finalPosZ = endPos.second;
-		        
-//        float step = 0.15f;
-        //float speed = 20.0f;
-        //float stepX = float(finalPosX - initPosX)/speed;
-        //float stepZ = float(finalPosZ - initPosZ)/speed;
-        
-        //implementation - verify if contains s piece on pieceStart!
+
         if (Matrix[initPosX][initPosZ] == NULL) {
             return false;
         }
@@ -397,29 +437,28 @@ public:
         }
         else
         {
-            Matrix[initPosX][initPosZ]->pos.y = 0.0;
-            //update boardMatrix with new position of the piece
-            // if piece killed another pice put it aside of the table
-            if (Matrix[finalPosX][finalPosZ] != NULL) {
-				std::cout << "Capture " << finalPosX << " " << finalPosZ << " " << Matrix[finalPosX][finalPosZ]->pieceType[0] << Matrix[finalPosX][finalPosZ]->pieceType[1] << std::endl;
-                // if piece is black piece goes to the right of the board, if is white goes to the left
-                if (Matrix[finalPosX][finalPosZ]->pieceType[0] == 'B') {
-                    Matrix[finalPosX][finalPosZ]->pos.x = -2.0f + nBPiecesDead; // -2.0f 18.0f
-                    Matrix[finalPosX][finalPosZ]->pos.z = 18.0f;
-                    nBPiecesDead++;
-                }
-                else
-                {
-                    Matrix[finalPosX][finalPosZ]->pos.x = 16.0f - nWPiecesDead;
-                    Matrix[finalPosX][finalPosZ]->pos.z = -4.0f;
-                    nWPiecesDead++;
-                }
-                
-            }
-            Matrix[finalPosX][finalPosZ] = Matrix[initPosX][initPosZ];
-            Matrix[initPosX][initPosZ] = NULL;
-            
-            movingPiece = false;
+			Matrix[initPosX][initPosZ]->pos.y = 0.0;
+
+			//update boardMatrix with new position of the piece
+			// if piece killed another pice put it aside of the table
+			if (capture) {
+				std::cout << "forward: " << moveForward << std::endl;
+				if (moveForward) {
+					std::cout << "capture" << std::endl;
+					capturePiece(finalPosX, finalPosZ);
+					Matrix[finalPosX][finalPosZ] = Matrix[initPosX][initPosZ];
+					Matrix[initPosX][initPosZ] = NULL;
+				} else {
+					std::cout << "uncapture" << std::endl;
+					Matrix[finalPosX][finalPosZ] = Matrix[initPosX][initPosZ];
+					Matrix[initPosX][initPosZ] = NULL;
+					uncapturePiece(initPosX, initPosZ);
+				}
+			} else {
+				Matrix[finalPosX][finalPosZ] = Matrix[initPosX][initPosZ];
+				Matrix[initPosX][initPosZ] = NULL;
+			}
+			movingPiece = false;
         }
         
         return movingPiece;
@@ -432,14 +471,6 @@ public:
 		posibilitiesStepsArrayAUX.index = 0;
 		std::string a, b;
 		float PI = 3.1415;
-		/*Step pos1;
-		Step pos2;
-		Step pos3;
-		Step pos4;
-		Step pos5;
-		Step pos6;
-		Step pos7;
-		Step pos8;*/
 		char letra = destination[0];
 		char numero = destination[1];
 		int posib = 0;
@@ -606,33 +637,18 @@ public:
 						posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[0] = letra;
 						posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[1] = numero;
 						posib++;
-						//Print
-						std::cout << posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[0];
-						std::cout << posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[1];
-						std::cout << '\n';
-					/*} else {
-						std::cout << "shit1" << std::endl;
-						posibilitiesStepsArrayAUX.index = posib;
-						std::cout << "shit2" << std::endl;
-						posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[0] = 'w';
-						std::cout << "shit3" << std::endl;
-						posibilitiesStepsArrayAUX.steps[posibilitiesStepsArrayAUX.index].pieceStart[1] = '9';
-						std::cout << "shit4" << std::endl;
-						posib++;
-						std::cout << "shit5" << std::endl;
-					}*/
 				}
 			}
 			break;
 		default: // Pawn
 			
 			//pos1.pieceStart[1] = destination[0] - 1; sirve para restar una letra
-			std::cout << "PAWN " << color << " " << destination[0] << destination[1] << std::endl;
+			//std::cout << "PAWN " << color << " " << destination[0] << destination[1] << std::endl;
 			//Normal move
 			int l = 0;
 			if (!capture) {
 				if (color == 'W') {
-					std::cout << "HOLA w!" << std::endl;
+					//std::cout << "HOLA w!" << std::endl;
 					posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0];
 					posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] - 1;
 					l++;
@@ -642,7 +658,7 @@ public:
 					l++;
 				}
 				else {
-					std::cout << "HOLA b!" << std::endl;
+					//std::cout << "HOLA b!" << std::endl;
 					posibilitiesStepsArrayAUX.steps[l].pieceStart[0] = destination[0];
 					posibilitiesStepsArrayAUX.steps[l].pieceStart[1] = destination[1] + 1;
 					l++;
@@ -654,7 +670,7 @@ public:
 			} else {
 				// Kill move diagonal
 				if (color == 'W') {
-					std::cout << "w KILL" << std::endl;
+					//std::cout << "w KILL" << std::endl;
 					std::cout << (char)(destination[1]) << (char)(destination[0]) << std::endl;
 					if (SimulationMatrix[destination[1] - '1'][destination[0] - 'a'] &&
 						(SimulationMatrix[destination[1] - '1'][destination[0] - 'a']->pieceType[0] == 'B')) {
@@ -666,7 +682,7 @@ public:
             l++;
 					}
 				} else {
-					std::cout << "b KILL" << std::endl;
+					//std::cout << "b KILL" << std::endl;
 					std::cout << (char)(destination[1]) << (char)(destination[0]) << std::endl;
 					///std::cout << SimulationMatrix[destination[1] + 1 - '1'][destination[0] + 1 - 'a'] << std::endl;
 					if (SimulationMatrix[destination[1] - '1'][destination[0] - 'a'] &&
@@ -679,7 +695,7 @@ public:
             l++;
 					}
 				}
-				std::cout << "after KILL" << std::endl;
+				//std::cout << "after KILL" << std::endl;
 			}
 
 			//Ad possibilities to array
@@ -762,7 +778,7 @@ public:
 		bool directions[9] = { true, true, true, true, true, true, true, true };
 
 		for (int i = 0; i <= posibilitiesStepsArrayAUX.index; i++) {
-			std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
+			//std::cout << posibilitiesStepsArrayAUX.steps[i].pieceStart[0] << posibilitiesStepsArrayAUX.steps[i].pieceStart[1] << std::endl;
 			char x = posibilitiesStepsArrayAUX.steps[i].pieceStart[0];
 			char y = posibilitiesStepsArrayAUX.steps[i].pieceStart[1];
 			//Now only prints what we found in that possible initial position
@@ -777,11 +793,11 @@ public:
 						}
 						//std::cout << "directions: " << directions[0] << directions[1] << directions[2] << directions[3] << directions[4] << directions[5] << directions[6] << directions[7] << directions[8] << std::endl;
 					} else {
-						std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
-						std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[0] << " should be " << color << std::endl;
+						//std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[1] << " should be " << piece << std::endl;
+						//std::cout << "It is " << SimulationMatrix[y - '1'][x - 'a']->pieceType[0] << " should be " << color << std::endl;
 						if ((SimulationMatrix[y - '1'][x - 'a']->pieceType[1] == piece) &&
 							(SimulationMatrix[y - '1'][x - 'a']->pieceType[0] == color)) {
-							std::cout << capture << " " << column << std::endl;
+							//std::cout << capture << " " << column << std::endl;
 							if (column != '\0' && column != 'x') {
 								if (x == column) {
 									counter++;
@@ -800,13 +816,13 @@ public:
 
 		if (counter < 1) {
 			std::cout << "UPS... None of posibilities is good :(" << std::endl;
-//            throw "UPS... None of posibilities is good :(";
+            throw "UPS... None of posibilities is good :(";
 		} else if (counter == 1) {
-			std::cout << "YAY! Only one option! " << posibilitiesStepsArrayAUX.steps[good].pieceStart[0] << posibilitiesStepsArrayAUX.steps[good].pieceStart[1] << std::endl;
+			//std::cout << "YAY! Only one option! " << posibilitiesStepsArrayAUX.steps[good].pieceStart[0] << posibilitiesStepsArrayAUX.steps[good].pieceStart[1] << std::endl;
 			simulateMove(posibilitiesStepsArrayAUX.steps[good].pieceStart, destination);
 		} else {
 			std::cout << "AHR... More than one posibility is correct :/" << std::endl;
-//            throw "AHR... More than one posibility is correct :/";
+            throw "AHR... More than one posibility is correct :/";
 		}
 		if (promotedTo) {
 			simulatePromotion(destination, promotedTo);
@@ -825,9 +841,9 @@ public:
 			s.rookStart[0] = 'a';
 			s.rookStart[1] = '1';
 			s.rookEnd[0] = 'd';
-s.rookEnd[1] = '1';
-simulateMove("e1", "c1");
-simulateMove("a1", "d1");
+			s.rookEnd[1] = '1';
+			simulateMove("e1", "c1");
+			simulateMove("a1", "d1");
 
 		}
  else {
@@ -897,6 +913,10 @@ simulateMove("a1", "d1");
 			return KCastling(color);
 		}
 
+		if (strstr(array_s, "x") != NULL) { // When a capture
+			return_step.capture = true;
+		}
+
 		//STORE DESTINATION
 		if (strstr(array_s, "=") != NULL) { // When a pawn reach to the other side of the board
 			return_step.pieceEnd[0] = array_s[strlen(array_s) - 4];
@@ -932,7 +952,6 @@ simulateMove("a1", "d1");
 		} else if (strlen(begin) > 0) {
 			column = begin[0];
 			capture = aditional_info == 'x';
-			return_step.capture = capture;
 		}
 
 		//std::cout << array_s[0] << array_s[1] << std::endl;
@@ -961,7 +980,7 @@ simulateMove("a1", "d1");
 
     public :StepsArray Read_Steps(std::string fileStr, std::string &header){
 		StepsArray steps_array_return;
-		steps_array_return.active = 0;
+		//steps_array_return.active = 0;
 		int steps_index = 0;
 
 		std::ifstream ifs;
