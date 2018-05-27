@@ -332,11 +332,11 @@ int main( void )
         if (movingPiece) {
 			if (movingBack) {
 				std::cout << "movingBack " << back << std::endl;
-				ax.active = max(ax.active - min(back - 1, 1), 0);
+				ax.active = min(max(ax.active - min(back - 1, 1), 0), ax.index);
 			}
 			if (movingForward) {
 				std::cout << "movingForward " << forward << std::endl;
-				ax.active = min(ax.active + min(forward - 1, 1), ax.index);
+				ax.active = min(ax.active + min(forward - 1, 1), ax.index - 1);
 			}
 			std::cout << "active = " << ax.active << std::endl;
 			if ((ax.active < ax.index) && (ax.active >= 0)) {
