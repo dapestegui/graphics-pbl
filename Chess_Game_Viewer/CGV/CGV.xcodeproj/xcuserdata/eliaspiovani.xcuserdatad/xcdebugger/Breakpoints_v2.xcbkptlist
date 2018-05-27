@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CGV/Object.cpp"
-            timestampString = "549047786.687189"
+            timestampString = "549067861.468776"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "188"
             endingLineNumber = "188"
-            landmarkName = "move(const char pieceStart[3], const char pieceEnd[3])"
+            landmarkName = "init(Object WhitePieces[16], Object BlackPieces[16])"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

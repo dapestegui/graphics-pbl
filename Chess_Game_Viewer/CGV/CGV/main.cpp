@@ -28,8 +28,6 @@ using namespace glm;
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 
-
-
 #include "shader.hpp"
 #include "texture.hpp"
 #include "controls.hpp"
@@ -271,7 +269,8 @@ int main( void )
     bool movingPiece = false;
 	bool promoting = false;
 	
-	StepsArray ax = boardMatrix.Read_Steps("./pgn/grafl_jones_2018.pgn");
+    std::string header = "Load PGN";
+    StepsArray ax = boardMatrix.Read_Steps("./pgn/grafl_jones_2018.pgn", header);
     
     do{
         // Clear the screen
@@ -477,6 +476,15 @@ int main( void )
             ImGui::End();
         }
         
+        // Game information
+        if (true) {
+            ImVec4 color = ImColor(255, 255, 255, 255);
+            ImGui::SetNextWindowBgAlpha(0.0);
+            ImGui::Begin("Game Information", NULL);
+            ImGui::TextColored(color, "%s", header.c_str());
+            ImGui::End();
+        }
+        
         // create a open file menu
         if (menuOpen) {
             ImGuiWindowFlags window_flags = 0;
@@ -523,7 +531,7 @@ int main( void )
             // button open
             if (ImGui::Button("Open"))
             {
-                char filePath[5] = "pgn/";
+                char filePath[1024] = "./pgn/";
                 strcat(filePath, file);
                 //                strcat(filePath, ".pgn");
                 
