@@ -339,6 +339,11 @@ int main( void )
 				std::cout << "movingForward " << forward << std::endl;
 				ax.active = min(ax.active + min(forward - 1, 1), ax.index - 1);
 			}
+
+			if (ax.active == ax.index - 1) {
+				std::cout << "IT IS THE END OF GAME" << std::endl;
+			}
+
 			std::cout << "active = " << ax.active << std::endl;
 			if ((ax.active < ax.index) && (ax.active >= 0)) {
 				Step activeStep = ax.steps[ax.active];
