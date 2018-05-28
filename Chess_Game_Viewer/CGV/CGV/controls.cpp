@@ -113,7 +113,7 @@ glm::vec3 computeMatricesFromInputs(const int &mouseButton){
                         );
     
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    ProjectionMatrix = glm::perspective(glm::radians(FoV), 4.0f / 3.0f, 0.1f, 300.0f);
+    ProjectionMatrix = glm::perspective(glm::radians(FoV), (float)width / (float)height, 0.1f, 300.0f);
     // Camera matrix
     //ViewMatrix       = glm::lookAt(position, position+direction, up);
     ViewMatrix       = glm::lookAt(position+direction, glm::vec3(7,0,7), glm::vec3(0,1,0));

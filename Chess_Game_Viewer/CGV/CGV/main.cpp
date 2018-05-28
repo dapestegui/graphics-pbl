@@ -279,6 +279,9 @@ int main( void )
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        glfwGetWindowSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+        
         ImGui_ImplGlfwGL3_NewFrame();
         
         // Use our shader
@@ -476,7 +479,7 @@ int main( void )
             ImGui::SetWindowSize(ImVec2 (264, 35));
             if (ImGui::Button("   <<  "))
             {
-                
+
             }
             ImGui::SameLine();
             if (ImGui::Button("   <   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
