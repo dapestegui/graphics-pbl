@@ -10,12 +10,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CGV/Object.cpp"
-            timestampString = "549154232.9824899"
+            timestampString = "549196093.7235"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "188"
             endingLineNumber = "188"
             landmarkName = "init(Object WhitePieces[16], Object BlackPieces[16])"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CGV/Object.cpp"
+            timestampString = "549196093.723736"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "567"
+            endingLineNumber = "567"
+            landmarkName = "GetPosibilities(char destination[], char piece, char color, bool capture, Object *SimulationMatrix[8][8])"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

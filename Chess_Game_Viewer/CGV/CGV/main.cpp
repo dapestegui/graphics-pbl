@@ -272,6 +272,7 @@ int main( void )
 	bool promoting = false;
 	
     std::string header = "Load PGN";
+    std::string recentList[3] = {"./pgn/grafl_jones_2018.pgn", "./pgn/rathnakaran_arjun_2017.pgn", "./pgn/jackson_jones_2016.pgn"};
     StepsArray ax;
     
     do{
@@ -398,9 +399,9 @@ int main( void )
                     }
                     if (ImGui::BeginMenu("Open Recent"))
                     {
-                        ImGui::MenuItem("fish_hat.c");
-                        ImGui::MenuItem("fish_hat.inl");
-                        ImGui::MenuItem("fish_hat.h");
+                        ImGui::TextDisabled(recentList[0].c_str());
+                        ImGui::TextDisabled(recentList[1].c_str());
+                        ImGui::TextDisabled(recentList[2].c_str());
                         
                         ImGui::EndMenu();
                     }
