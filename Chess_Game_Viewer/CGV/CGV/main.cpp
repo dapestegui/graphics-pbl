@@ -263,7 +263,7 @@ int main( void )
     //    glm::vec3 lightPos = glm::vec3(7,15,7);
     //    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     
-    static bool menuOpen = false, menuDebug = false, menuEndGame = false;
+    static bool menuOpen = false, menuDebug = false, menuEndGame = false, menuAbout = false;
     static bool mouseControl = false;
     static int mouseButton = GLFW_MOUSE_BUTTON_MIDDLE;
     static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
@@ -466,7 +466,7 @@ int main( void )
                 }
                 if (ImGui::BeginMenu("Help"))
                 {
-                    if (ImGui::MenuItem("About")) {}
+                    if (ImGui::MenuItem("About", NULL, menuAbout)) menuAbout = !menuAbout;
                     if (ImGui::MenuItem("Debug", NULL, menuDebug)) menuDebug = !menuDebug;
                     ImGui::EndMenu();
                 }
@@ -484,12 +484,12 @@ int main( void )
             window_flags |= ImGuiWindowFlags_NoMove;
             window_flags |= ImGuiWindowFlags_NoNav;
             ImGui::Begin("Buttons", 0, window_flags);
-            ImGui::SetWindowPos(ImVec2 (width/2 - 264/2, height - 45));
-            ImGui::SetWindowSize(ImVec2 (264, 35));
-            if (ImGui::Button("   <<  "))
-            {
-
-            }
+            ImGui::SetWindowPos(ImVec2 (width/2 - 160/2, height - 45));
+            ImGui::SetWindowSize(ImVec2 (160, 35));
+//            if (ImGui::Button("   <<  "))
+//            {
+//
+//            }
             ImGui::SameLine();
             if (ImGui::Button("   <   ") && !movingPiece && ax.index > 0)         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
             {
@@ -505,10 +505,10 @@ int main( void )
                 movingPiece = true;
             }
             ImGui::SameLine();
-            if (ImGui::Button("   >>  "))
-            {
-                
-            }
+//            if (ImGui::Button("   >>  "))
+//            {
+//
+//            }
             ImGui::End();
         }
         
@@ -519,6 +519,23 @@ int main( void )
             ImGui::Text("Cam.X %.2f, Cam.Y %.2f, Cam.Z %.2f", camPos.x, camPos.y, camPos.z);
             ImGui::Text("Moving piece: %s", movingPiece ? "True":"False");
             ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        
+        // About window
+        if (menuAbout) {
+            ImGui::SetNextWindowBgAlpha(1.0);
+            ImGui::Begin("About", NULL);
+            ImGui::Text("                       Chess Game Viewer v1.0\n\n");
+            ImGui::Text("Developed by:");
+            ImGui::Text("Diego Apestegui");
+            ImGui::Text("Elias Kasma Piovani");
+            ImGui::Text("Joanna Wiszowata");
+            ImGui::Text("Nicolas Santullo");
+            ImGui::Text("Moran Gybels");
+            ImGui::Text("Zhoobin Jalili");
+            ImGui::Text("\n                     Project Based Learning\nFor the Master in Computer Engineering, UAB. Year 2018.");
+            ImGui::Text("Mentoring: Professor Enric Marti Godia - enric.marti@uab.cat");
             ImGui::End();
         }
         
