@@ -263,7 +263,7 @@ int main( void )
     //    glm::vec3 lightPos = glm::vec3(7,15,7);
     //    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     
-    static bool menuOpen = false, menuDebug = false;
+    static bool menuOpen = false, menuDebug = false, menuEndGame = false;
     static bool mouseControl = false;
     static int mouseButton = GLFW_MOUSE_BUTTON_MIDDLE;
     static int oldState = GLFW_RELEASE;//, oldStateC = GLFW_RELEASE;
@@ -279,9 +279,11 @@ int main( void )
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        // update window size
         glfwGetWindowSize(window, &width, &height);
         glViewport(0, 0, width, height);
         
+        // prepare frame for ImGui
         ImGui_ImplGlfwGL3_NewFrame();
         
         // Use our shader
@@ -310,7 +312,7 @@ int main( void )
         // when Space is pressed the software loads the next turn and set the flag movingPiece=True indicating a new movement
         // oldState enables the function only when the key is pressed, not while it is pressed
         int nextStep = glfwGetKey( window, GLFW_KEY_RIGHT );
-        if (nextStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece){
+        if (nextStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece && ax.index > 0 && !menuEndGame){
             movingPiece = true;
 			movingForward = true;
 			forward++;
@@ -322,7 +324,7 @@ int main( void )
         else if (nextStep == GLFW_RELEASE && oldState == GLFW_PRESS) oldState = GLFW_RELEASE;
 
 		int previousStep = glfwGetKey(window, GLFW_KEY_LEFT);
-		if (previousStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece) {
+		if (previousStep == GLFW_PRESS && oldState == GLFW_RELEASE && !movingPiece && ax.index > 0) {
 			movingPiece = true;
 			movingBack = true;
 			back++;
@@ -343,9 +345,10 @@ int main( void )
 				ax.active = min(ax.active + min(forward - 1, 1), ax.index - 1);
 			}
 
-			if (ax.active == ax.index - 1) {
+			if (ax.active == ax.index -1) {
 				std::cout << "IT IS THE END OF GAME" << std::endl;
-			}
+                menuEndGame = true;
+            } else menuEndGame = false;
 
 			std::cout << "active = " << ax.active << std::endl;
 			if ((ax.active < ax.index) && (ax.active >= 0)) {
@@ -390,6 +393,7 @@ int main( void )
 					movingPiece = boardMatrix.move(pieceStart, pieceEnd, forward > 0, activeStep.capture);
 				}
 			}
+            if (!movingPiece) boardMatrix.print();
         }
         
         // creates the menu bar
@@ -487,14 +491,14 @@ int main( void )
 
             }
             ImGui::SameLine();
-            if (ImGui::Button("   <   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+            if (ImGui::Button("   <   ") && !movingPiece && ax.index > 0)         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
             {
 				movingBack = true;
 				back++;
 				movingPiece = true;
             }
             ImGui::SameLine();
-            if (ImGui::Button("   >   "))         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+            if (ImGui::Button("   >   ") && !movingPiece && ax.index > 0 && !menuEndGame)         // Buttons return true when clicked (NB: most widgets return true when edited/activated)
             {
 				movingForward = true;
 				forward++;
@@ -515,6 +519,19 @@ int main( void )
             ImGui::Text("Cam.X %.2f, Cam.Y %.2f, Cam.Z %.2f", camPos.x, camPos.y, camPos.z);
             ImGui::Text("Moving piece: %s", movingPiece ? "True":"False");
             ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        
+        // End game window
+        if (menuEndGame) {
+            ImGuiWindowFlags window_flags = 0;
+            window_flags |= ImGuiWindowFlags_NoResize;
+            window_flags |=ImGuiWindowFlags_NoTitleBar;
+            ImGui::SetNextWindowBgAlpha(1.0);
+            ImGui::SetNextWindowSize(ImVec2 (130,35));
+            ImGui::SetNextWindowPos(ImVec2 (width/2 - 65, 30));
+            ImGui::Begin("", NULL, window_flags);
+            ImGui::Text("End of the game");
             ImGui::End();
         }
         
@@ -582,6 +599,7 @@ int main( void )
                 ax.index = 0;
                 ax.active = 0;
                 back, forward = 0;
+                menuEndGame = false;
                 ax = boardMatrix.Read_Steps(filePath, header);
                 // reset board to the initial positions
                 setInitialPos(WPieces, BPieces);

@@ -653,7 +653,8 @@ public:
 			//pos1.pieceStart[1] = destination[0] - 1; sirve para restar una letra
 			//std::cout << "PAWN " << color << " " << destination[0] << destination[1] << std::endl;
 			//Normal move
-			int l = 0;
+                int l = 0;
+                
 			if (!capture) {
 				if (color == 'W') {
 					//std::cout << "HOLA w!" << std::endl;

@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CGV/Object.cpp"
-            timestampString = "549197824.714533"
+            timestampString = "549393762.164938"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "188"
@@ -26,11 +26,27 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "CGV/Object.cpp"
-            timestampString = "549197824.714583"
+            timestampString = "549393762.165171"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "567"
             endingLineNumber = "567"
+            landmarkName = "GetPosibilities(char destination[], char piece, char color, bool capture, Object *SimulationMatrix[8][8])"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CGV/Object.cpp"
+            timestampString = "549393762.165354"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "651"
+            endingLineNumber = "651"
             landmarkName = "GetPosibilities(char destination[], char piece, char color, bool capture, Object *SimulationMatrix[8][8])"
             landmarkType = "7">
          </BreakpointContent>
