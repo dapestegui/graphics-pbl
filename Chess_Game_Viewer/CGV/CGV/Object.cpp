@@ -173,6 +173,14 @@ private:
 public:
     void init(Object WhitePieces[16], Object BlackPieces[16])
     {
+		nBPiecesDead = 0;
+		nWPiecesDead = 0;
+		capturedIndex = 0;
+		movingPiece = false;
+
+		for (int i = 0; i < 32; i++) {
+			Captured[i] = NULL;
+		}
         // Init matrix with Null values
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -989,8 +997,6 @@ public:
 
     public :StepsArray Read_Steps(std::string fileStr, std::string &header){
 		StepsArray steps_array_return;
-        nBPiecesDead = 0;
-        nWPiecesDead = 0;
         
 		//steps_array_return.active = 0;
 		int steps_index = 0;
