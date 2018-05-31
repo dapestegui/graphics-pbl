@@ -47,9 +47,9 @@ void drawOBJ(Object &obj, ProjMatrix &PM)
     
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, obj.texture);
+    glBindTexture(GL_TEXTURE_2D, *obj.texture);
     // Set our "myTextureSampler" sampler to use Texture Unit 0
-    glUniform1i(obj.textureID, 0);
+    glUniform1i(*obj.textureID, 0);
     
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -128,7 +128,7 @@ void setInitialPos(Object *WPieces, Object *BPieces)
     BPieces[15].setPos(14.0f, 0.0f, 8.0f);
 }
 
-void initPieces(Object *WPieces, Object *BPieces, GLuint Texture_White, GLuint Texture_Black, GLuint TextureID) {
+void initPieces(Object *WPieces, Object *BPieces, const GLuint &Texture_White, const GLuint &Texture_Black, const GLuint &TextureID) {
 	//Load the obj file and copy the data for all Pawns
 	WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
 	for (int i = 0; i < 8; ++i)
@@ -157,7 +157,7 @@ void initPieces(Object *WPieces, Object *BPieces, GLuint Texture_White, GLuint T
 	BPieces[15].load("resources/CB_King.obj", "BK", Texture_Black, TextureID);
 }
 
-void reloadPawns(Object *WPieces, Object *BPieces, GLuint Texture_White, GLuint Texture_Black, GLuint TextureID) {
+void reloadPawns(Object *WPieces, Object *BPieces, GLuint &Texture_White, const GLuint &Texture_Black, const GLuint &TextureID) {
 	for (int i = 0; i < 8; ++i) {
 		if (WPieces[i].needReload) {
 			WPieces[i].del();
