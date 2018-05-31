@@ -41,9 +41,12 @@ public:
     GLuint vb;
     GLuint uvb;
     GLuint nb;
-    const GLuint *texture;
-    const GLuint *textureID;
+    GLuint texture;
+    GLuint textureID;
     glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	bool needReload;
+
+	Object() : needReload(false) {}
 
     Object cloneLogic() {
         Object object;
@@ -52,7 +55,7 @@ public:
         return object;
     }
     
-    void load(const char *path, char *piecetype, const GLuint &Texture, const GLuint &TextureID)
+    void load(const char *path, char *piecetype, GLuint Texture, GLuint TextureID)
     {
         memcpy(pieceType, piecetype, 2);
         
@@ -71,8 +74,8 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, nb);
         glBufferData(GL_ARRAY_BUFFER, n.size() * sizeof(glm::vec3), &n[0], GL_STATIC_DRAW);
         
-        texture = &Texture;
-        textureID = &TextureID;
+        texture = Texture;
+        textureID = TextureID;
     }
     
     void del()
@@ -364,7 +367,8 @@ public:
 						Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a']->pieceType[1] = promotedTo;
 						Object* piece = Matrix[pieceEnd[1] - '1'][pieceEnd[0] - 'a'];
 						piece->del();
-						piece->load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+						piece->load(pathToObj(promotedTo), piece->pieceType, piece->texture, piece->textureID);
+						piece->needReload = true;
 					}
 					return fallDown(pieceEnd);
 				}
@@ -377,7 +381,8 @@ public:
 				Matrix[pieceStart[1] - '1'][pieceStart[0] - 'a']->pieceType[1] = promotedTo;
 				Object* piece = Matrix[pieceStart[1] - '1'][pieceStart[0] - 'a'];
 				piece->del();
-				piece->load(pathToObj(promotedTo), piece->pieceType, *piece->texture, *piece->textureID);
+				piece->load(pathToObj(promotedTo), piece->pieceType, piece->texture, piece->textureID);
+				piece->needReload = false;
 			}
 			return move(pieceStart, pieceEnd, false, capture);
 		}

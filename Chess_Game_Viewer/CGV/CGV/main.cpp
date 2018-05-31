@@ -47,9 +47,9 @@ void drawOBJ(Object &obj, ProjMatrix &PM)
     
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, *obj.texture);
+    glBindTexture(GL_TEXTURE_2D, obj.texture);
     // Set our "myTextureSampler" sampler to use Texture Unit 0
-    glUniform1i(*obj.textureID, 0);
+    glUniform1i(obj.textureID, 0);
     
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -126,6 +126,50 @@ void setInitialPos(Object *WPieces, Object *BPieces)
     BPieces[13].setPos(14.0f, 0.0f, 10.0f);
     BPieces[14].setPos(14.0f, 0.0f, 6.0f);
     BPieces[15].setPos(14.0f, 0.0f, 8.0f);
+}
+
+void initPieces(Object *WPieces, Object *BPieces, GLuint Texture_White, GLuint Texture_Black, GLuint TextureID) {
+	//Load the obj file and copy the data for all Pawns
+	WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
+	for (int i = 0; i < 8; ++i)
+		WPieces[i].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
+
+	WPieces[8].load("resources/CB_Rook.obj", "WR", Texture_White, TextureID);
+	WPieces[9] = WPieces[8];
+	WPieces[10].load("resources/CB_Knight.obj", "WN", Texture_White, TextureID);
+	WPieces[11] = WPieces[10];
+	WPieces[12].load("resources/CB_Bishop.obj", "WB", Texture_White, TextureID);
+	WPieces[13] = WPieces[12];
+	WPieces[14].load("resources/CB_Queen.obj", "WQ", Texture_White, TextureID);
+	WPieces[15].load("resources/CB_King.obj", "WK", Texture_White, TextureID);
+
+	//Load the obj file and copy the data for all Pawns
+	for (int i = 0; i < 8; ++i)
+		BPieces[i].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
+
+	BPieces[8].load("resources/CB_Rook.obj", "BR", Texture_Black, TextureID);
+	BPieces[9] = BPieces[8];
+	BPieces[10].load("resources/CB_KnightB.obj", "BN", Texture_Black, TextureID);
+	BPieces[11] = BPieces[10];
+	BPieces[12].load("resources/CB_Bishop.obj", "BB", Texture_Black, TextureID);
+	BPieces[13] = BPieces[12];
+	BPieces[14].load("resources/CB_Queen.obj", "BQ", Texture_Black, TextureID);
+	BPieces[15].load("resources/CB_King.obj", "BK", Texture_Black, TextureID);
+}
+
+void reloadPawns(Object *WPieces, Object *BPieces, GLuint Texture_White, GLuint Texture_Black, GLuint TextureID) {
+	for (int i = 0; i < 8; ++i) {
+		if (WPieces[i].needReload) {
+			WPieces[i].del();
+			WPieces[i].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
+			WPieces[i].needReload = false;
+		}
+		if (BPieces[i].needReload) {
+			BPieces[i].del();
+			BPieces[i].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
+			BPieces[i].needReload = false;
+		}
+	}
 }
 
 int main( void )
@@ -215,32 +259,7 @@ int main( void )
     // 0 to 7 - Pawn / 8 and 9 - Rook / 10 and 11 - Knight / 12 and 13 - Bishop / 14 - Queen / 15 - King
     Object WPieces[16], BPieces[16];
     
-    //Load the obj file and copy the data for all Pawns
-    WPieces[0].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
-	for (int i = 0; i < 8; ++i)
-		WPieces[i].load("resources/CB_Pawn.obj", "WP", Texture_White, TextureID);
-    
-    WPieces[8].load("resources/CB_Rook.obj", "WR", Texture_White, TextureID);
-    WPieces[9] = WPieces[8];
-    WPieces[10].load("resources/CB_Knight.obj", "WN", Texture_White, TextureID);
-    WPieces[11] = WPieces[10];
-    WPieces[12].load("resources/CB_Bishop.obj", "WB", Texture_White, TextureID);
-    WPieces[13] = WPieces[12];
-    WPieces[14].load("resources/CB_Queen.obj", "WQ", Texture_White, TextureID);
-    WPieces[15].load("resources/CB_King.obj", "WK", Texture_White, TextureID);
-    
-    //Load the obj file and copy the data for all Pawns
-	for (int i = 0; i < 8; ++i)
-		BPieces[i].load("resources/CB_Pawn.obj", "BP", Texture_Black, TextureID);
-    
-    BPieces[8].load("resources/CB_Rook.obj", "BR", Texture_Black, TextureID);
-    BPieces[9] = BPieces[8];
-    BPieces[10].load("resources/CB_KnightB.obj", "BN", Texture_Black, TextureID);
-    BPieces[11] = BPieces[10];
-    BPieces[12].load("resources/CB_Bishop.obj", "BB", Texture_Black, TextureID);
-    BPieces[13] = BPieces[12];
-    BPieces[14].load("resources/CB_Queen.obj", "BQ", Texture_Black, TextureID);
-    BPieces[15].load("resources/CB_King.obj", "BK", Texture_Black, TextureID);
+	initPieces(WPieces, BPieces, Texture_White, Texture_Black, TextureID);
     
     setInitialPos(WPieces, BPieces);
     
@@ -617,6 +636,7 @@ int main( void )
                 ax.active = 0;
                 back, forward = 0;
                 menuEndGame = false;
+				reloadPawns(WPieces, BPieces, Texture_White, Texture_Black, TextureID);
                 ax = boardMatrix.Read_Steps(filePath, header);
                 // reset board to the initial positions
                 setInitialPos(WPieces, BPieces);
